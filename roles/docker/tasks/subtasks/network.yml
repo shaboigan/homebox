@@ -1,0 +1,51 @@
+#########################################################################
+#                   GNU General Public License v3.0                     #
+#########################################################################
+---
+- name: Network | Get list of docker networks
+  shell: docker network ls --format '{{ '{{' }} .Name{{ '}}' }}'
+  register: docker_networks
+
+- name: Network | Get redbeard docker network gateway
+  shell: docker network inspect redbeard -f '{{ '{{' }}range .IPAM.Config{{ '}}' }}{{ '{{' }}.Gateway{{ '}}' }}{{ '{{' }}end{{ '}}' }}'
+  register: docker_gateway
+  when: ('redbeard' in docker_networks.stdout_lines)
+
+- name: "Network | Create new redbeard docker network block"
+  block:
+
+  - name: Create redbeard network
+    docker_network:
+      name: redbeard
+      state: present
+
+  when: ('redbeard' not in docker_networks.stdout_lines)
+
+- name: "Network | Rebuild existing redbeard docker network block"
+  block:
+
+  - name: Network | Get list of containers on redbeard network
+    shell: docker ps -a --filter network=redbeard --format '{{ '{{' }}.Names{{ '}}' }}'
+    register: docker_containers
+
+  - name: Network | Disconnect containers from bridge network
+    shell: docker network disconnect -f bridge {{ item }}
+    with_items: "{{ docker_containers.stdout_lines }}"
+    register: r
+    failed_when: r.rc > 1
+    ignore_errors: yes
+
+  - name: Network | Rebuild redbeard network
+    docker_network:
+      name: redbeard
+      state: present
+      force: yes
+
+  - name: Network | Connect containers to redbeard network
+    shell: docker network connect redbeard {{ item }} --alias {{ item }}
+    with_items: "{{ docker_containers.stdout_lines }}"
+    register: q
+    failed_when: q.rc > 1
+    ignore_errors: yes
+
+  when: ('redbeard' in docker_networks.stdout_lines) and (docker_gateway.stdout == '172.18.0.254')

@@ -1,0 +1,64 @@
+#########################################################################
+#                   GNU General Public License v3.0                     #
+#########################################################################
+---
+- name: Install common packages
+  apt:
+    state: present
+    name:
+      - jq
+      - figlet
+      - toilet
+      - boxes
+      - dnsutils
+
+- name: Install common pip modules
+  pip:
+    state: present
+    name:
+      - yq
+
+- name: Create script directories
+  file: "path={{ item }} state=directory mode=0775 owner={{ user.name }} group={{ user.name }} recurse=yes"
+  with_items:
+    - /opt/scripts    
+    - /opt/scripts/docker
+    - /opt/scripts/frontail
+
+- name: Check if 'restart_containers.sh' exists
+  stat:
+    path: "/opt/scripts/docker/restart_containers.sh"
+    get_attributes: false
+    get_checksum: false
+    get_md5: false
+    get_mime: false
+  register: restart_containers
+
+- name: Import 'restart_containers.sh'
+  copy:
+    src: "restart_containers.sh"
+    dest: "/opt/scripts/docker/restart_containers.sh"
+    owner: "{{ user.name }}"
+    group: "{{ user.name }}"
+    mode: 0775
+    force: yes
+  when: not restart_containers.stat.exists
+
+- name: Check if 'frontail_custom_preset.json' exists
+  stat:
+    path: "/opt/scripts/frontail/frontail_custom_preset.json"
+    get_attributes: false
+    get_checksum: false
+    get_md5: false
+    get_mime: false
+  register: frontail_preset
+
+- name: Import 'frontail_custom_preset.json'
+  copy:
+    src: "frontail_custom_preset.json"
+    dest: "/opt/scripts/frontail/frontail_custom_preset.json"
+    owner: "{{ user.name }}"
+    group: "{{ user.name }}"
+    mode: 0775
+    force: yes
+  when: not frontail_preset.stat.exists

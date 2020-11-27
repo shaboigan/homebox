@@ -1,0 +1,9 @@
+#########################################################################
+#                   GNU General Public License v3.0                     #
+#########################################################################
+---
+- name: "Re-encrypt | Re-encrypt '{{ file }}' if previously encrypted"
+  shell: "ansible-vault encrypt {{ playbook_dir }}/{{ file }}"
+  become: yes
+  become_user: "{{ homebox_yml.stat.pw_name }}"
+  when: file_is_encrypted

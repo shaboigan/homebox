@@ -1,0 +1,58 @@
+#########################################################################
+#                   GNU General Public License v3.0                     #
+#########################################################################
+---
+- name: "Set DNS Record on CloudFlare"
+  include_role:
+    name: cloudflare-dns
+  vars:
+    subdomain: tasmoadmin
+
+- name: Slurp hashed htpasswd
+  slurp:
+    src: "/opt/traefik/.htpasswd"
+  register: hashed
+
+- name: Set hashed password
+  set_fact:
+    htpasswd: "{{ hashed['content'] | b64decode }}"
+
+- name: Stop and remove any existing container
+  docker_container:
+    name: tasmoadmin
+    state: absent
+
+- name: Create tasmoadmin directories
+  file: "path={{ item }} state=directory mode=0775 owner={{ user.name }} group={{ user.name }}"
+  with_items:
+    - /opt/tasmoadmin
+    - /opt/scripts/tasmoadmin
+
+- name: Create and start container
+  docker_container:
+    name: tasmoadmin
+    image: ""
+    pull: yes
+    published_ports:
+      - "127.0.0.1:8088:8088"
+    env:
+      USER_ID: "{{ uid }}"
+      GROUP_ID: "{{ gid }}"
+    labels:
+      traefik.enable: "true"
+      traefik.backend: "tasmoadmin"
+      traefik.frontend.redirect.entryPoint: "https"
+      traefik.frontend.rule: "Host:tasmoadmin.{{ user.domain }}"
+      traefik.port: "8123"
+      traefik.frontend.auth.basic: "{{ htpasswd }}"
+      traefik.docker.network: "redbeard"
+      "com.github.homebox.homebox_managed": "true"
+    volumes:
+      - "/opt/tasmoadmin:/config:rw"
+    networks:
+      - name: redbeard
+        aliases:
+          - tasmoadmin
+    purge_networks: yes
+    restart_policy: always
+    state: started

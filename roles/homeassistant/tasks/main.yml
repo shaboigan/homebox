@@ -1,0 +1,58 @@
+#########################################################################
+#                   GNU General Public License v3.0                     #
+#########################################################################
+---
+- name: "Set DNS Record on CloudFlare"
+  include_role:
+    name: cloudflare-dns
+  vars:
+    subdomain: homeassistant
+
+- name: Slurp hashed htpasswd
+  slurp:
+    src: "/opt/traefik/.htpasswd"
+  register: hashed
+
+- name: Set hashed password
+  set_fact:
+    htpasswd: "{{ hashed['content'] | b64decode }}"
+
+- name: Stop and remove any existing container
+  docker_container:
+    name: homeassistant
+    state: absent
+
+- name: Create homeassistant directories
+  file: "path={{ item }} state=directory mode=0775 owner={{ user.name }} group={{ user.name }}"
+  with_items:
+    - /opt/homeassistant
+    - /opt/scripts/homeassistant
+
+- name: Create and start container
+  docker_container:
+    name: homeassistant
+    image: "homeassistant/raspberrypi4-64-homeassistant"
+    pull: yes
+    published_ports:
+      - "127.0.0.1:8123:8123"
+    env:
+      USER_ID: "{{ uid }}"
+      GROUP_ID: "{{ gid }}"
+    labels:
+      traefik.enable: "true"
+      traefik.backend: "homeassistant"
+      traefik.frontend.redirect.entryPoint: "https"
+      traefik.frontend.rule: "Host:homeassistant.{{ user.domain }}"
+      traefik.port: "8123"
+      traefik.frontend.auth.basic: "{{ htpasswd }}"
+      traefik.docker.network: "redbeard"
+      "com.github.homebox.homebox_managed": "true"
+    volumes:
+      - "/opt/homeassistant:/config:rw"
+    networks:
+      - name: redbeard
+        aliases:
+          - homeassistant
+    purge_networks: yes
+    restart_policy: always
+    state: started

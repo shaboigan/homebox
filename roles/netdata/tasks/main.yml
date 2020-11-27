@@ -1,0 +1,58 @@
+#########################################################################
+#                   GNU General Public License v3.0                     #
+#########################################################################
+---
+- name: "Set DNS Record on CloudFlare"
+  include_role:
+    name: cloudflare-dns
+  vars:
+    subdomain: netdata
+  when: cloudflare_enabled
+
+- name: Slurp hashed htpasswd
+  slurp:
+    src: "/opt/traefik/.htpasswd"
+  register: hashed
+
+- name: Set hashed password
+  set_fact:
+    htpasswd: "{{ hashed['content'] | b64decode }}"
+
+- name: Stop and remove any existing container
+  docker_container:
+    name: netdata
+    state: absent
+
+- name: Create and start container
+  docker_container:
+    name: netdata
+    image: "titpetric/netdata:latest"
+    pull: yes
+    capabilities:
+      - SYS_PTRACE
+    published_ports:
+      - "127.0.0.1:19999:19999"
+    env:
+    volumes:
+      - "/etc/localtime:/etc/localtime:ro"
+      - "/proc:/host/proc:ro"
+      - "/sys:/host/sys:ro"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    labels:
+      traefik.enable: "true"
+      traefik.backend: "netdata"
+      traefik.frontend.redirect.entryPoint: "https"
+      traefik.frontend.rule: "Host:netdata.{{ user.domain }}"
+      traefik.port: "19999"
+      traefik.frontend.auth.basic: "{{ htpasswd }}"
+      traefik.docker.network: "redbeard"
+      "com.github.homebox.homebox_managed": "true"
+    networks:
+      - name: redbeard
+        aliases:
+          - netdata
+    purge_networks: yes
+    restart_policy: unless-stopped
+    security_opts:
+      - apparmor:unconfined
+    state: started

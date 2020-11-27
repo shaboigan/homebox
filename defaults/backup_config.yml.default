@@ -1,0 +1,15 @@
+---
+local:
+  enable: yes
+  destination: /mnt/local/Backups/Homebox
+rclone:
+  enable: no
+  destination: rclone.remote:/Backups/Homebox
+cron:
+  cron_time: weekly
+  cron_state: absent
+restore_service:
+  user:
+  pass:
+misc:
+  snapshot: true

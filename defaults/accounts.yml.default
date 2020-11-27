@@ -1,0 +1,14 @@
+---
+user:
+  name: seed
+  pass: password123
+  domain: testhomebox.ml
+  email: your@email.com
+cloudflare:
+  email:
+  api:
+htpasswd:
+  user:
+  pass:
+slack:
+  token:

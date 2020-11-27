@@ -1,0 +1,116 @@
+#########################################################################
+#                   GNU General Public License v3.0                     #
+#########################################################################
+---
+- name: "Setting CloudFlare DNS Record"
+  include_role:
+    name: cloudflare
+  vars:
+    subdomain: "{{ traefik.subdomain|default('traefik',true) }}"
+
+- name: Create traefik directories
+  file: "path={{ item }} state=directory mode=0775 owner={{ user.name }} group={{ user.name }} recurse=yes"
+  with_items:
+    - /opt/traefik
+    - /opt/traefik/acme
+
+- name: Check traefik.toml exists
+  stat:
+    path: "/opt/traefik/traefik.toml"
+  register: traefik_toml
+
+- name: Import traefik.toml
+  template:
+    src: traefik.toml
+    dest: /opt/traefik/traefik.toml
+    mode: 0775
+    owner: "{{ user.name }}"
+    group: "{{ user.name }}"
+    force: yes
+  when: traefik_toml.stat.exists == False
+
+- name: Check acme.json exists
+  stat:
+    path: "/opt/traefik/acme/acme.json"
+  register: acme_json
+
+- name: Touch or create blank acme.json
+  file:
+    path: "/opt/traefik/acme/acme.json"
+    state: touch
+    mode: 0600
+    owner: "{{ user.name }}"
+    group: "{{ user.name }}"
+  when: acme_json.stat.exists == False
+
+- name: Check rules.toml exists
+  stat:
+    path: "/opt/traefik/rules.toml"
+  register: rules_toml
+
+- name: Touch or create blank rules.toml
+  file:
+    path: "/opt/traefik/rules.toml"
+    state: touch
+    mode: 0775
+    owner: "{{ user.name }}"
+    group: "{{ user.name }}"
+  when: rules_toml.stat.exists == False
+
+- name: Check .htpasswd exists
+  stat:
+    path: "/opt/traefik/.htpasswd"
+  register: htpasswd
+
+- name: Create htpasswd
+  htpasswd:
+    path: "/opt/traefik/.htpasswd"
+    name: "{{ htpasswd.user }}"
+    password: "{{ htpasswd.pass }}"
+    owner: "{{ user.name }}"
+    group: "{{ user.name }}"
+    mode: 0664
+  when: htpasswd.stat.exists == False
+
+- name: Stop and remove any existing container
+  docker_container:
+    name: traefik
+    state: absent
+
+- name: Create and start container
+  docker_container:
+    name: traefik
+    image: "traefik:v1.7.24"
+    pull: yes
+    published_ports:
+      - "80:80"
+      - "443:443"
+      - "9876:8080"
+    env:
+      PUID: "{{ uid }}"
+      PGID: "{{ gid }}"
+      PROVIDER: "cloudflare"
+      CLOUDFLARE_EMAIL: "{{ cloudflare.email }}"
+      CLOUDFLARE_API_KEY: "{{ cloudflare.api }}"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /etc/localtime:/etc/localtime:ro
+      - /opt/traefik/traefik.toml:/etc/traefik/traefik.toml:ro
+      - /opt/traefik/.htpasswd:/etc/traefik/.htpasswd:ro
+      - /opt/traefik/rules.toml:/etc/traefik/rules.toml:ro
+      - /opt/traefik/acme:/etc/traefik/acme
+    labels:
+      traefik.enable: "true"
+      traefik.backend: "traefik"
+      traefik.frontend.redirect.entryPoint: "https"
+      traefik.frontend.rule: "Host:{{ traefik.subdomain|default('traefik',true) }}.{{ user.domain }}"
+      traefik.port: "8080"
+      traefik.docker.network: "redbeard"
+      "com.github.homebox.homebox_managed": "true"      
+    networks:
+      - name: redbeard
+        aliases:
+          - traefik
+    purge_networks: yes
+    restart_policy: always
+    state: started

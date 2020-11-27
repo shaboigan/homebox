@@ -1,0 +1,15 @@
+#########################################################################
+# Title:         Homebox: Backup Excludes List                         #
+# Author(s):     desimaniac                                             #
+# URL:           https://github.com/Homebox/Homebox                   #
+# --                                                                    #
+#         Part of the Homebox project: https://homebox.works          #
+#########################################################################
+#                   GNU General Public License v3.0                     #
+#########################################################################
+
+./homebox/backup/modified_files/*
+
+./cloudplow/cloudplow.log
+./cloudplow/cloudplow.log.*
+./cloudplow/locks/*

@@ -1,0 +1,12 @@
+#########################################################################
+#                   GNU General Public License v3.0                     #
+#########################################################################
+---
+- name: "Remove Subdomain | Cloudflare: Remove 'homebox' subdomain from '{{ user.domain }}'"
+  cloudflare_dns:
+    account_api_token: "{{ cloudflare.api }}"
+    account_email: "{{ cloudflare.email }}"
+    zone: "{{ user.domain }}"
+    state: absent
+    type: A
+    record: "homebox"

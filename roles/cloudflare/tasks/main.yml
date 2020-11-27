@@ -1,0 +1,15 @@
+#########################################################################
+#                   GNU General Public License v3.0                     #
+#########################################################################
+---
+- name: Variables Task
+  import_tasks: "subtasks/variables.yml"
+  ignore_errors: yes
+
+- name: Purge Cache Task
+  import_tasks: "subtasks/purge_cache.yml"
+  ignore_errors: yes
+
+- name: Page Rules Task
+  import_tasks: "subtasks/page_rules.yml"
+  ignore_errors: yes

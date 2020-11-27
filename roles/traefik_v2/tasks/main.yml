@@ -1,0 +1,105 @@
+#########################################################################
+#                   GNU General Public License v3.0                     #
+#########################################################################
+---
+- name: "Setting CloudFlare DNS Record"
+  include_role:
+    name: cloudflare
+  vars:
+    subdomain: "{{ traefik.subdomain|default('traefik',true) }}"
+  when: cloudflare_enabled
+
+- name: Create traefik directories
+  file: "path={{ item }} state=directory mode=0775 owner={{ user.name }} group={{ user.name }}"
+  with_items:
+    - /opt/traefik
+
+- name: Check traefik.yml exists
+  stat:
+    path: "/opt/traefik/traefik.yml"
+  register: traefik_yml
+
+- name: Import traefik.yml
+  template:
+    src: traefik.yml
+    dest: "/opt/traefik/traefik.yml"
+    mode: 0775
+    owner: "{{ user.name }}"
+    group: "{{ user.name }}"
+    force: yes
+  when: traefik_yml.stat.exists == False
+
+- name: Check config.yml exists
+  stat:
+    path: "/opt/traefik/config.yml"
+  register: config_yml
+
+- name: Import config.yml
+  template:
+    src: config.yml
+    dest: "/opt/traefik/config.yml"
+    mode: 0775
+    owner: "{{ user.name }}"
+    group: "{{ user.name }}"
+    force: yes
+  when: config_yml.stat.exists == False
+
+- name: Check acme.json exists
+  stat:
+    path: "/opt/traefik/acme.json"
+  register: acme_json
+
+- name: Create blank acme.json
+  file: "path={{ item }} state=touch mode=0600 owner={{ user.name }} group={{ user.name }}"
+  with_items: "/opt/traefik/acme.json"
+  when: acme_json.stat.exists == False
+
+- name: Stop and remove any existing container
+  docker_container:
+    name: traefik
+    state: absent
+
+- name: Create and start container
+  docker_container:
+    name: traefik
+    image: traefik:v2.2
+    pull: yes
+    published_ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"
+    env:
+      PUID: "{{ uid }}"
+      PGID: "{{ gid }}"
+      CF_API_EMAIL: "{{ cloudflare.email }}"
+      CF_API_KEY: "{{ cloudflare.api }}"
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /opt/traefik/traefik.yml:/traefik.yml:ro
+      - /opt/traefik/acme.json:/acme.json
+      - /opt/traefik/config.yml:/config.yml:ro
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.traefik.entrypoints: "http"
+      traefik.http.routers.traefik.rule: "Host(`{{ traefik.subdomain|default('traefik',true) }}.{{ user.domain }}`)"
+      traefik.http.middlewares.traefik-auth.basicauth.users: "{{ htpasswd.user }}:{{ htpasswd.pass }}"
+      traefik.http.middlewares.traefik-https-redirect.redirectscheme.scheme: "https"
+      traefik.http.routers.traefik.middlewares: "traefik-https-redirect"
+      traefik.http.routers.traefik-secure.entrypoints: "https"
+      traefik.http.routers.traefik-secure.rule: "Host(`{{ traefik.subdomain|default('traefik',true) }}.{{ user.domain }}`)"
+      traefik.http.routers.traefik-secure.middlewares: "traefik-auth"
+      traefik.http.routers.traefik-secure.tls: "true"
+      traefik.http.routers.traefik-secure.tls.certresolver: "http"
+      traefik.http.routers.traefik-secure.tls.certresolver: "cloudflare"
+      traefik.http.routers.traefik-secure.tls.domains[0].main: "{{ user.domain}}"
+      traefik.http.routers.traefik-secure.tls.domains[0].sans: "*.{{ user.domain}}"
+      traefik.http.routers.traefik-secure.service: "api@internal"      
+      traefik.http.services.traefik.loadbalancer.server.port: "8080"
+    networks:
+      - name: redbeard
+        aliases:
+          - traefik
+    purge_networks: yes
+    restart_policy: always
+    state: started

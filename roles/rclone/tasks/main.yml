@@ -1,0 +1,16 @@
+#########################################################################
+#                   GNU General Public License v3.0                     #
+#########################################################################
+---
+- name: Build URL Tasks
+  import_tasks: "build_url.yml"
+
+- name: Install Binary Tasks
+  import_tasks: "install_binary.yml"
+
+- name: Import Existing Config Tasks
+  import_tasks: "import_config.yml"
+
+- name: Preinstall Tasks
+  include_tasks: "preinstall.yml"
+  when: ('preinstall' in ansible_run_tags)

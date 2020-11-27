@@ -31,24 +31,24 @@
 - name: Create and start container
   docker_container:
     name: nodered
-    image: ""
+    image: "nodered/node-red:latest"
     pull: yes
     published_ports:
-      - "127.0.0.1:8123:8123"
+      - "127.0.0.1:1880:1880"
     env:
       USER_ID: "{{ uid }}"
       GROUP_ID: "{{ gid }}"
     labels:
-      traefik.enable: "true"
+      traefik.enable: "{{ traefik.enable }}"
       traefik.backend: "nodered"
       traefik.frontend.redirect.entryPoint: "https"
       traefik.frontend.rule: "Host:nodered.{{ user.domain }}"
-      traefik.port: "8123"
+      traefik.port: "1880"
       traefik.frontend.auth.basic: "{{ htpasswd }}"
       traefik.docker.network: "redbeard"
       "com.github.homebox.homebox_managed": "true"
     volumes:
-      - "/opt/nodered:/config:rw"
+      - "/opt/nodered:/data:rw"
     networks:
       - name: redbeard
         aliases:

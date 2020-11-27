@@ -31,24 +31,29 @@
 - name: Create and start container
   docker_container:
     name: mosquitto
-    image: ""
+    image: "eclipse-mosquitto"
     pull: yes
     published_ports:
-      - "127.0.0.1:8123:8123"
+      - 1883:1883
+      - 8883:8883
+      - 9001:9001
     env:
       USER_ID: "{{ uid }}"
       GROUP_ID: "{{ gid }}"
+      TZ: "{{ tz }}"
     labels:
-      traefik.enable: "true"
+      traefik.enable: "false"
       traefik.backend: "mosquitto"
       traefik.frontend.redirect.entryPoint: "https"
       traefik.frontend.rule: "Host:mosquitto.{{ user.domain }}"
-      traefik.port: "8123"
+      traefik.port: "1883"
       traefik.frontend.auth.basic: "{{ htpasswd }}"
       traefik.docker.network: "redbeard"
       "com.github.homebox.homebox_managed": "true"
     volumes:
-      - "/opt/mosquitto:/config:rw"
+      - "/opt/mosquitto/config:/mosquitto/config:rw"
+      - "/opt/mosquitto/data:/mosquitto/data:rw"
+      - "/opt/mosquitto/logs:/mosquitto/logs:rw"
     networks:
       - name: redbeard
         aliases:

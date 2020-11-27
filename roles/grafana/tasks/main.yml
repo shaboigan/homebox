@@ -38,8 +38,9 @@
     env:
       USER_ID: "{{ uid }}"
       GROUP_ID: "{{ gid }}"
+      GF_INSTALL_PLUGINS: "grafana-clock-panel,grafana-simple-json-datasource"
     labels:
-      traefik.enable: "true"
+      traefik.enable: "{{ traefik.enable }}"
       traefik.backend: "grafana"
       traefik.frontend.redirect.entryPoint: "https"
       traefik.frontend.rule: "Host:grafana.{{ user.domain }}"
@@ -48,7 +49,7 @@
       traefik.docker.network: "redbeard"
       "com.github.homebox.homebox_managed": "true"
     volumes:
-      - "/opt/grafana:/config:rw"
+#      - "/opt/grafana:/config:rw"
     networks:
       - name: redbeard
         aliases:

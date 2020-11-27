@@ -31,24 +31,24 @@
 - name: Create and start container
   docker_container:
     name: tasmoadmin
-    image: ""
+    image: "raymondmm/tasmoadmin"
     pull: yes
     published_ports:
-      - "127.0.0.1:8088:8088"
+      - "127.0.0.1:5555:80"
     env:
       USER_ID: "{{ uid }}"
       GROUP_ID: "{{ gid }}"
     labels:
-      traefik.enable: "true"
+      traefik.enable: "{{ traefik.enable }}"
       traefik.backend: "tasmoadmin"
       traefik.frontend.redirect.entryPoint: "https"
       traefik.frontend.rule: "Host:tasmoadmin.{{ user.domain }}"
-      traefik.port: "8123"
+      traefik.port: "80"
       traefik.frontend.auth.basic: "{{ htpasswd }}"
       traefik.docker.network: "redbeard"
       "com.github.homebox.homebox_managed": "true"
     volumes:
-      - "/opt/tasmoadmin:/config:rw"
+      - "/opt/tasmoadmin/data:/data:rw"
     networks:
       - name: redbeard
         aliases:

@@ -15,4 +15,5 @@ vpn:
   port: 
   config: 
 traefik:
+  enable: no
   subdomain: traefik

@@ -31,24 +31,33 @@
 - name: Create and start container
   docker_container:
     name: pihole
-    image: ""
+    image: "pihole/pihole:latest"
     pull: yes
+    capabilities:
+      - NET_ADMIN
     published_ports:
-      - "127.0.0.1:8123:8123"
+      - "53:53/tcp"
+      - "53:53/udp"
+      - "67:67/udp"
+      - "8080:80"
+      - "8443:443"
     env:
       USER_ID: "{{ uid }}"
       GROUP_ID: "{{ gid }}"
+      TZ: "{{ tz }}"
+      WEBPASSWORD: "{{ user.pass }}"
     labels:
-      traefik.enable: "true"
+      traefik.enable: "{{ traefik.enable }}"
       traefik.backend: "pihole"
       traefik.frontend.redirect.entryPoint: "https"
       traefik.frontend.rule: "Host:pihole.{{ user.domain }}"
-      traefik.port: "8123"
+      traefik.port: "80"
       traefik.frontend.auth.basic: "{{ htpasswd }}"
       traefik.docker.network: "redbeard"
       "com.github.homebox.homebox_managed": "true"
     volumes:
-      - "/opt/pihole:/config:rw"
+      - "/opt/pihole/etc-pihole/:/etc/pihole/"
+      - "/opt/pihole/etc-dnsmasq.d/:/etc/dnsmasq.d/"
     networks:
       - name: redbeard
         aliases:

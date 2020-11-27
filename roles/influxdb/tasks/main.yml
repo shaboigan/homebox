@@ -35,13 +35,11 @@
     pull: yes
     published_ports:
       - "127.0.0.1:8086:8086"
-      - "127.0.0.1:8083:8083"
-      - "127.0.0.1:2003:2003"
     env:
       USER_ID: "{{ uid }}"
       GROUP_ID: "{{ gid }}"
     labels:
-      traefik.enable: "true"
+      traefik.enable: "{{ traefik.enable }}"
       traefik.backend: "influxdb"
       traefik.frontend.redirect.entryPoint: "https"
       traefik.frontend.rule: "Host:influxdb.{{ user.domain }}"
@@ -50,7 +48,7 @@
       traefik.docker.network: "redbeard"
       "com.github.homebox.homebox_managed": "true"
     volumes:
-      - "/opt/influxdb:/config:rw"
+      - "/opt/influxdb:/var/lib/influxdb:rw"
     networks:
       - name: redbeard
         aliases:

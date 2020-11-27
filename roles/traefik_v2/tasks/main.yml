@@ -80,7 +80,7 @@
       - /opt/traefik/acme.json:/acme.json
       - /opt/traefik/config.yml:/config.yml:ro
     labels:
-      traefik.enable: "true"
+      traefik.enable: "{{ traefik.enable }}"
       traefik.http.routers.traefik.entrypoints: "http"
       traefik.http.routers.traefik.rule: "Host(`{{ traefik.subdomain|default('traefik',true) }}.{{ user.domain }}`)"
       traefik.http.middlewares.traefik-auth.basicauth.users: "{{ htpasswd.user }}:{{ htpasswd.pass }}"

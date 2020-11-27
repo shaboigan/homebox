@@ -34,7 +34,7 @@
     image: "raymondmm/tasmoadmin"
     pull: yes
     published_ports:
-      - "127.0.0.1:5555:80"
+      - "5555:80"
     env:
       USER_ID: "{{ uid }}"
       GROUP_ID: "{{ gid }}"

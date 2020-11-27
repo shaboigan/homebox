@@ -31,7 +31,7 @@
     capabilities:
       - SYS_PTRACE
     published_ports:
-      - "127.0.0.1:19999:19999"
+      - "19999:19999"
     env:
     volumes:
       - "/etc/localtime:/etc/localtime:ro"

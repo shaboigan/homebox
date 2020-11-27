@@ -34,7 +34,7 @@
     image: "homeassistant/raspberrypi4-64-homeassistant"
     pull: yes
     published_ports:
-      - "127.0.0.1:8123:8123"
+      - "8123:8123"
     env:
       USER_ID: "{{ uid }}"
       GROUP_ID: "{{ gid }}"

@@ -17,7 +17,7 @@
     - "/opt/scripts/rclone"
 
 - name: Install Binary | Cleanup rclone tmp path
-  shell: rm -rf /tmp/rclone-*-linux-amd64
+  shell: rm -rf /tmp/rclone-*-linux-arm64
   args:
     warn: no
 
@@ -34,7 +34,7 @@
     validate_certs: no
 
 - name: Install Binary | Find rclone tmp dir
-  shell: ls -d /tmp/rclone-*-linux-amd64
+  shell: ls -d /tmp/rclone-*-linux-arm64
   register: rclone_tmp_dir
 
 - name: Install Binary | Copy binary to /usr/bin/rclone

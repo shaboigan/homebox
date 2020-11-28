@@ -22,6 +22,11 @@
   import_tasks: "subtasks/apt.yml"
   tags: always
 
+- name: "Set Homebox Type to 'homebox'"
+  set_fact:
+    homebox_type: "homebox"
+  tags: homebox
+
 - name: "Set Backup config settings"
   block:
 

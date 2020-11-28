@@ -45,12 +45,12 @@
   set_fact:
     new_home_path: "/home/{{ user.name }}"
 
-- name: "Do following tasks when not in the user's redbeard folder"
+- name: "Do following tasks when not in the user's homebox folder"
   block:
 
-  - name: "Delete previous redbeard folder if it exists"
+  - name: "Delete previous homebox folder if it exists"
     file:
-      path: "/home/{{ user.name }}/redbeard"
+      path: "/home/{{ user.name }}/homebox"
       state: absent
 
   - name: "Get current git branch"
@@ -60,7 +60,7 @@
   - name: "Clone Homebox project"
     git:
       repo: "https://github.com/shaboigan/homebox.git"
-      dest: "{{ new_home_path }}/redbeard/"
+      dest: "{{ new_home_path }}/homebox/"
       version: "{{ git_branch.stdout }}"
       clone: yes
       force: yes
@@ -68,10 +68,10 @@
     become_user: "{{ user.name }}"
     ignore_errors: yes
 
-  - name: "Copy config files to redbeard folder"
+  - name: "Copy config files to homebox folder"
     copy:
       src: "{{ item }}"
-      dest: "{{ new_home_path }}/redbeard/"
+      dest: "{{ new_home_path }}/homebox/"
       owner: "{{ user.name }}"
       group: "{{ user.name }}"
       decrypt: no
@@ -98,13 +98,13 @@
       force: yes
     when: (ansible_vault.stat.exists)
 
-  - name: "Quit playbook after creation of new redbeard folder location"
+  - name: "Quit playbook after creation of new homebox folder location"
     fail:
       msg:
-        - "Redbeard folder was migrated to a home location."
+        - "Homebox folder was migrated to a home location."
         - "Please re-login with the '{{ user.name }}' account and rerun the {{
-            ('restore' in ansible_run_tags) | ternary('restore tag','Redbeard Installer') }}
-            from the '{{ new_home_path }}/redbeard/' path."
+            ('restore' in ansible_run_tags) | ternary('restore tag','Homebox Installer') }}
+            from the '{{ new_home_path }}/homebox/' path."
     when: ('preinstall' not in ansible_run_tags)
 
   - name: "Set preinstall variables"
@@ -112,7 +112,7 @@
       preinstall_user_relogin: true
     when: ('preinstall' in ansible_run_tags)
 
-  when: (playbook_dir != (new_home_path + '/redbeard')) and not (continuous_integration)
+  when: (playbook_dir != (new_home_path + '/homebox')) and not (continuous_integration)
 
 - name: "Reset ownership of '{{ new_home_path }}/' path"
   file: "path={{ new_home_path }} state=directory owner={{ user.name }} group={{ user.name }} recurse=yes follow=no"

@@ -49,13 +49,13 @@
   
   - name: "Set Homebox Type in backup_config"
     replace:
-      path: "~/homebox/backup_config.yml"
+      path: "/home/{{ user.name }}/homebox/backup_config.yml"
       regexp: 'Homebox'
       replace: "{{ homebox_type }}"
   
   - name: "Set rclone remote in backup_config"
     replace:
-      path: "~/homebox/backup_config.yml"
+      path: "/home/{{ user.name }}/homebox/backup_config.yml"
       regexp: 'rclone.remote'
       replace: "{{ rclone.remote }}"
   

@@ -11,24 +11,24 @@
     - { role: pre_tasks, tags: ['pre_tasks'] }
     - { role: backup, tags: ['backup'] }
     - { role: restore, tags: ['restore'] }
-    - { role: user, tags: ['core', ' homebox', 'preinstall', 'user'] }
-    - { role: shell, tags: ['core', ' homebox', 'preinstall', 'shell'] }
-    - { role: rclone, tags: ['core', ' homebox', 'preinstall', 'rclone'] }
-    - { role: system, tags: ['core', ' homebox', 'system'] }
-    - { role: common, tags: ['core', ' homebox', 'common'] }
-    - { role: motd, tags: ['core', ' homebox', 'motd'] }
-    - { role: docker, tags: ['core', ' homebox', 'docker'] }
-    - { role: pihole, tags: ['core', ' homebox', 'pihole'] }
-    - { role: remote, tags: ['core', ' homebox', 'mounts', 'mounts_override'], when: ['use_remote'] }
-    - { role: unionfs, tags: ['core', ' homebox', 'mounts', 'mounts_override'] }
-    - { role: scripts, tags: ['core', ' homebox', 'scripts'] }
-    - { role: traefik, tags: ['core', ' homebox', 'traefik'] }
-    - { role: homeassistant, tags: ['core', ' homebox', 'homeassistant'] }
-    - { role: grafana, tags: ['core', ' homebox', 'grafana'] }
-    - { role: nodered, tags: ['core', ' homebox', 'nodered'] }
-    - { role: tasmoadmin, tags: ['core', ' homebox', 'tasmoadmin'] }
-    - { role: influxdb, tags: ['core', ' homebox', 'influxdb'] }
-    - { role: mosquitto, tags: ['core', ' homebox', 'mosquitto'] }
-    - { role: cloudflare, tags: ['core', ' homebox', 'cloudflare'], when: ['cloudflare_enabled'] }
+    - { role: user, tags: ['core', 'homebox', 'preinstall', 'user'] }
+    - { role: shell, tags: ['core', 'homebox', 'preinstall', 'shell'] }
+    - { role: rclone, tags: ['core', 'homebox', 'preinstall', 'rclone'] }
+    - { role: system, tags: ['core', 'homebox', 'system'] }
+    - { role: common, tags: ['core', 'homebox', 'common'] }
+    - { role: motd, tags: ['core', 'homebox', 'motd'] }
+    - { role: docker, tags: ['core', 'homebox', 'docker'] }
+    - { role: pihole, tags: ['core', 'homebox', 'pihole'] }
+    - { role: remote, tags: ['core', 'homebox', 'mounts', 'mounts_override'], when: ['use_remote'] }
+    - { role: unionfs, tags: ['core', 'homebox', 'mounts', 'mounts_override'] }
+    - { role: scripts, tags: ['core', 'homebox', 'scripts'] }
+    - { role: traefik, tags: ['core', 'homebox', 'traefik'] }
+    - { role: homeassistant, tags: ['core', 'homebox', 'homeassistant'] }
+    - { role: grafana, tags: ['core', 'homebox', 'grafana'] }
+    - { role: nodered, tags: ['core', 'homebox', 'nodered'] }
+    - { role: tasmoadmin, tags: ['core', 'homebox', 'tasmoadmin'] }
+    - { role: influxdb, tags: ['core', 'homebox', 'influxdb'] }
+    - { role: mosquitto, tags: ['core', 'homebox', 'mosquitto'] }
+    - { role: cloudflare, tags: ['core', 'homebox', 'cloudflare'], when: ['cloudflare_enabled'] }
     - { role: feeder, tags: ['feeder_mount', 'feeder_mount_override', 'feeder_unmount'] }
     - { role: netdata, tags: ['netdata'] }

@@ -8,9 +8,8 @@
     state: absent
   ignore_errors: yes
 
-- name: Variables | Fetch Cloudflare Page Rules
-  shell: |
-    "curl -fsSL 'https://get.docker.com' -o get-docker.sh; sh get-docker.sh"
+- name: Binary | Install Docker
+  shell: "curl -fsSL 'https://get.docker.com' -o get-docker.sh; sh get-docker.sh"
 
 #- name: Binary | Add official gpg signing key
 #  apt_key:

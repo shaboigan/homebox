@@ -3,7 +3,7 @@
 #########################################################################
 ---
 - name: Get latest hostess URL
-  shell: curl -s https://api.github.com/repos/cbednarski/hostess/releases/latest | jq -r ".assets[] | select(.name | test(\"linux_arm64\")) | .browser_download_url"
+  shell: curl -s https://api.github.com/repos/cbednarski/hostess/releases/latest | jq -r ".assets[] | select(.name | test(\"linux_arm\")) | .browser_download_url"
   args:
     executable: /bin/bash
   register: hostess_download_url
@@ -11,7 +11,7 @@
 
 - name: Install hostess
   get_url:
-    url:  "{{ hostess_download_url.stdout | default('https://github.com/cbednarski/hostess/releases/download/v0.3.0/hostess_linux_arm64',true) }}"
+    url:  "{{ hostess_download_url.stdout | default('https://github.com/cbednarski/hostess/releases/download/v0.3.0/hostess_linux_arm',true) }}"
     dest: /usr/local/bin/hostess
     mode: 0775
     owner: root

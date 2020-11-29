@@ -139,17 +139,6 @@
       - jmespath
   ignore_errors: yes
 
-- name: Uninstall apt glances
-  apt:
-    name: glances
-    state: absent
-  ignore_errors: yes
-  tags: glances
-
-- name: Install pip glances
-  shell: pip install glances[action,browser,cloud,cpuinfo,docker,folders,gpu,graph,ip,raid,snmp,web]
-  tags: glances
-
 - name: Install nodejs
   import_role:
     name: nodejs

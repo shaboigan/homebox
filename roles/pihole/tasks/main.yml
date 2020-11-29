@@ -8,14 +8,14 @@
   vars:
     subdomain: pihole
 
-- name: Slurp hashed htpasswd
-  slurp:
-    src: "/opt/traefik/.htpasswd"
-  register: hashed
-
-- name: Set hashed password
-  set_fact:
-    htpasswd: "{{ hashed['content'] | b64decode }}"
+#- name: Slurp hashed htpasswd
+#  slurp:
+#    src: "/opt/traefik/.htpasswd"
+#  register: hashed
+#
+#- name: Set hashed password
+#  set_fact:
+#    htpasswd: "{{ hashed['content'] | b64decode }}"
 
 - name: Stop and remove any existing container
   docker_container:

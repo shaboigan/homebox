@@ -42,7 +42,7 @@
       TZ: "{{ tz }}"
       SSHPORT: 22
     labels:
-      traefik.enable: "{{ traefik.enable }}"
+      traefik.enable: "true"
       traefik.backend: "displaycameras"
       traefik.frontend.redirect.entryPoint: "https"
       traefik.frontend.rule: "Host:displaycameras.{{ user.domain }}"

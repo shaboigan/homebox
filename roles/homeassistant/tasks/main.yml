@@ -40,7 +40,7 @@
       GROUP_ID: "{{ gid }}"
       TZ: "{{ tz }}"
     labels:
-      traefik.enable: "{{ traefik.enable }}"
+      traefik.enable: "true"
       traefik.backend: "homeassistant"
       traefik.frontend.redirect.entryPoint: "https"
       traefik.frontend.rule: "Host:homeassistant.{{ user.domain }}"

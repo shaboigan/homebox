@@ -100,7 +100,7 @@
       - /opt/traefik/rules.toml:/etc/traefik/rules.toml:ro
       - /opt/traefik/acme:/etc/traefik/acme
     labels:
-      traefik.enable: "{{ traefik.enable }}"
+      traefik.enable: "true"
       traefik.backend: "traefik"
       traefik.frontend.redirect.entryPoint: "https"
       traefik.frontend.rule: "Host:{{ traefik.subdomain|default('traefik',true) }}.{{ user.domain }}"

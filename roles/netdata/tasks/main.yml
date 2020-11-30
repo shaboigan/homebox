@@ -39,7 +39,7 @@
       - "/sys:/host/sys:ro"
       - "/var/run/docker.sock:/var/run/docker.sock"
     labels:
-      traefik.enable: "{{ traefik.enable }}"
+      traefik.enable: "true"
       traefik.backend: "netdata"
       traefik.frontend.redirect.entryPoint: "https"
       traefik.frontend.rule: "Host:netdata.{{ user.domain }}"

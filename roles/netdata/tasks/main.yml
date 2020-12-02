@@ -2,21 +2,21 @@
 #                   GNU General Public License v3.0                     #
 #########################################################################
 ---
-- name: "Set DNS Record on CloudFlare"
-  include_role:
-    name: cloudflare-dns
-  vars:
-    subdomain: netdata
-  when: cloudflare_enabled
-
-- name: Slurp hashed htpasswd
-  slurp:
-    src: "/opt/traefik/.htpasswd"
-  register: hashed
-
-- name: Set hashed password
-  set_fact:
-    htpasswd: "{{ hashed['content'] | b64decode }}"
+#- name: "Set DNS Record on CloudFlare"
+#  include_role:
+#    name: cloudflare-dns
+#  vars:
+#    subdomain: netdata
+#  when: cloudflare_enabled
+#
+#- name: Slurp hashed htpasswd
+#  slurp:
+#    src: "/opt/traefik/.htpasswd"
+#  register: hashed
+#
+#- name: Set hashed password
+#  set_fact:
+#    htpasswd: "{{ hashed['content'] | b64decode }}"
 
 - name: Stop and remove any existing container
   docker_container:
@@ -39,13 +39,13 @@
       - "/sys:/host/sys:ro"
       - "/var/run/docker.sock:/var/run/docker.sock"
     labels:
-      traefik.enable: "true"
-      traefik.backend: "netdata"
-      traefik.frontend.redirect.entryPoint: "https"
-      traefik.frontend.rule: "Host:netdata.{{ user.domain }}"
-      traefik.port: "19999"
-      traefik.frontend.auth.basic: "{{ htpasswd }}"
-      traefik.docker.network: "redbeard"
+#      traefik.enable: "true"
+#      traefik.backend: "netdata"
+#      traefik.frontend.redirect.entryPoint: "https"
+#      traefik.frontend.rule: "Host:netdata.{{ user.domain }}"
+#      traefik.port: "19999"
+#      traefik.frontend.auth.basic: "{{ htpasswd }}"
+#      traefik.docker.network: "redbeard"
       "com.github.homebox.homebox_managed": "true"
     networks:
       - name: redbeard

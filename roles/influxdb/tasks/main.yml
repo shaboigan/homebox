@@ -2,20 +2,20 @@
 #                   GNU General Public License v3.0                     #
 #########################################################################
 ---
-- name: "Set DNS Record on CloudFlare"
-  include_role:
-    name: cloudflare-dns
-  vars:
-    subdomain: influxdb
-
-- name: Slurp hashed htpasswd
-  slurp:
-    src: "/opt/traefik/.htpasswd"
-  register: hashed
-
-- name: Set hashed password
-  set_fact:
-    htpasswd: "{{ hashed['content'] | b64decode }}"
+#- name: "Set DNS Record on CloudFlare"
+#  include_role:
+#    name: cloudflare-dns
+#  vars:
+#    subdomain: influxdb
+#
+#- name: Slurp hashed htpasswd
+#  slurp:
+#    src: "/opt/traefik/.htpasswd"
+#  register: hashed
+#
+#- name: Set hashed password
+#  set_fact:
+#    htpasswd: "{{ hashed['content'] | b64decode }}"
 
 - name: Stop and remove any existing container
   docker_container:
@@ -39,13 +39,13 @@
       USER_ID: "{{ uid }}"
       GROUP_ID: "{{ gid }}"
     labels:
-      traefik.enable: "true"
-      traefik.backend: "influxdb"
-      traefik.frontend.redirect.entryPoint: "https"
-      traefik.frontend.rule: "Host:influxdb.{{ user.domain }}"
-      traefik.port: "8086"
-      traefik.frontend.auth.basic: "{{ htpasswd }}"
-      traefik.docker.network: "redbeard"
+#      traefik.enable: "true"
+#      traefik.backend: "influxdb"
+#      traefik.frontend.redirect.entryPoint: "https"
+#      traefik.frontend.rule: "Host:influxdb.{{ user.domain }}"
+#      traefik.port: "8086"
+#      traefik.frontend.auth.basic: "{{ htpasswd }}"
+#      traefik.docker.network: "redbeard"
       "com.github.homebox.homebox_managed": "true"
     volumes:
       - "/opt/influxdb:/var/lib/influxdb:rw"

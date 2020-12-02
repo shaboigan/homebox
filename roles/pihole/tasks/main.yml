@@ -2,20 +2,20 @@
 #                   GNU General Public License v3.0                     #
 #########################################################################
 ---
-- name: "Set DNS Record on CloudFlare"
-  include_role:
-    name: cloudflare-dns
-  vars:
-    subdomain: pihole
-
-- name: Slurp hashed htpasswd
-  slurp:
-    src: "/opt/traefik/.htpasswd"
-  register: hashed
-
-- name: Set hashed password
-  set_fact:
-    htpasswd: "{{ hashed['content'] | b64decode }}"
+#- name: "Set DNS Record on CloudFlare"
+#  include_role:
+#    name: cloudflare-dns
+#  vars:
+#    subdomain: pihole
+#
+#- name: Slurp hashed htpasswd
+#  slurp:
+#    src: "/opt/traefik/.htpasswd"
+#  register: hashed
+#
+#- name: Set hashed password
+#  set_fact:
+#    htpasswd: "{{ hashed['content'] | b64decode }}"
 
 - name: Stop and remove any existing container
   docker_container:
@@ -35,31 +35,32 @@
     pull: yes
     capabilities:
       - NET_ADMIN
-    published_ports:
-      - "53:53/tcp"
-      - "53:53/udp"
-      - "67:67/udp"
-      - "8080:80"
-      - "8443:443"
+    network_mode: host
+#    published_ports:
+#      - "53:53/tcp"
+#      - "53:53/udp"
+#      - "67:67/udp"
+#      - "8080:80"
+#      - "8443:443"
     env:
       USER_ID: "{{ uid }}"
       GROUP_ID: "{{ gid }}"
       TZ: "{{ tz }}"
       WEBPASSWORD: "{{ user.pass }}"
     labels:
-      traefik.enable: "true"
-      traefik.backend: "pihole"
-      traefik.frontend.redirect.entryPoint: "https"
-      traefik.frontend.rule: "Host:pihole.{{ user.domain }}"
-      traefik.port: "80"
-      traefik.frontend.auth.basic: "{{ htpasswd }}"
-      traefik.docker.network: "redbeard"
+#      traefik.enable: "true"
+#      traefik.backend: "pihole"
+#      traefik.frontend.redirect.entryPoint: "https"
+#      traefik.frontend.rule: "Host:pihole.{{ user.domain }}"
+#      traefik.port: "80"
+#      traefik.frontend.auth.basic: "{{ htpasswd }}"
+#      traefik.docker.network: "redbeard"
       "com.github.homebox.homebox_managed": "true"
     volumes:
       - "/opt/pihole/etc-pihole/:/etc/pihole/"
       - "/opt/pihole/etc-dnsmasq.d/:/etc/dnsmasq.d/"
     networks:
-      - name: redbeard
+#      - name: redbeard
         aliases:
           - pihole
     purge_networks: yes

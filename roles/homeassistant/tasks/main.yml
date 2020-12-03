@@ -16,6 +16,7 @@
 - name: Create and start container
   docker_container:
     name: homeassistant
+    hostname: homeassistant
     image: "homeassistant/raspberrypi4-64-homeassistant"
     pull: yes
     published_ports:

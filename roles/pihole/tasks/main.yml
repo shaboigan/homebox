@@ -4,7 +4,7 @@
 ---
 - name: Stop and remove any existing container
   docker_container:
-    name: homepi
+    name: pihole
     state: absent
 
 - name: Create pihole directories
@@ -16,6 +16,7 @@
 - name: Create and start container
   docker_container:
     name: pihole
+    hostname: pihole
     image: "pihole/pihole:latest"
     pull: yes
     capabilities:
@@ -39,7 +40,7 @@
     networks:
       - name: redbeard
         aliases:
-          - homepi
+          - pihole
     purge_networks: yes
     restart_policy: always
     state: started

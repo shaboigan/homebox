@@ -16,6 +16,7 @@
 - name: Create and start container
   docker_container:
     name: grafana
+    hostname: grafana
     image: "grafana/grafana"
     pull: yes
     published_ports:

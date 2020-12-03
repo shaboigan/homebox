@@ -16,6 +16,7 @@
 - name: Create and start container
   docker_container:
     name: tasmoadmin
+    hostname: tasmoadmin
     image: "raymondmm/tasmoadmin"
     pull: yes
     published_ports:

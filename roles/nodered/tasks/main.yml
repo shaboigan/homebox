@@ -15,6 +15,7 @@
 
 - name: Create and start container
   docker_container:
+    hostname: nodered
     name: nodered
     image: "nodered/node-red:latest"
     pull: yes

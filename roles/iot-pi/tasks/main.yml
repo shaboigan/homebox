@@ -4,17 +4,18 @@
 ---
 - name: Stop and remove any existing container
   docker_container:
-    name: homepi
+    name: iotpi
     state: absent
 
 - name: Create pihole directories
   file: "path={{ item }} state=directory mode=0775 owner={{ user.name }} group={{ user.name }}"
   with_items:
-    - /opt/IoTpi
+    - /opt/iotpi
 
 - name: Create and start container
   docker_container:
-    name: pihole
+    name: iotpi
+    hostname: iotpi
     image: "pihole/pihole:latest"
     pull: yes
     capabilities:
@@ -33,12 +34,12 @@
     labels:
       "com.github.homebox.homebox_managed": "true"
     volumes:
-      - "/opt/pihole/etc-pihole/:/etc/pihole/"
-      - "/opt/pihole/etc-dnsmasq.d/:/etc/dnsmasq.d/"
+      - "/opt/iotpi/etc-pihole/:/etc/pihole/"
+      - "/opt/iotpi/etc-dnsmasq.d/:/etc/dnsmasq.d/"
     networks:
       - name: IoT
         aliases:
-          - homepi
+          - iotpi
     purge_networks: yes
     restart_policy: always
     state: started

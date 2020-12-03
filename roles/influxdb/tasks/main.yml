@@ -16,6 +16,7 @@
 - name: Create and start container
   docker_container:
     name: influxdb
+    hostname: influxdb
     image: "influxdb:latest"
     pull: yes
     published_ports:

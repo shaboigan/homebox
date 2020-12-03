@@ -16,6 +16,7 @@
 - name: Create and start container
   docker_container:
     name: mosquitto
+    hostname: mosquitto
     image: "eclipse-mosquitto"
     pull: yes
     published_ports:

@@ -21,12 +21,13 @@
     pull: yes
     capabilities:
       - NET_ADMIN
-    published_ports:
-      - "53:53/tcp"
-      - "53:53/udp"
-      - "67:67/udp"
-      - "8080:80"
-      - "8443:443"
+    network_mode: host
+#    published_ports:
+#      - "53:53/tcp"
+#      - "53:53/udp"
+#      - "67:67/udp"
+#      - "8080:80"
+#      - "8443:443"
     env:
       USER_ID: "{{ uid }}"
       GROUP_ID: "{{ gid }}"
@@ -37,10 +38,10 @@
     volumes:
       - "/opt/pihole/etc-pihole/:/etc/pihole/"
       - "/opt/pihole/etc-dnsmasq.d/:/etc/dnsmasq.d/"
-    networks:
-      - name: redbeard
-        aliases:
-          - pihole
+#    networks:
+#      - name: redbeard
+#        aliases:
+#          - pihole
     purge_networks: yes
     restart_policy: always
     state: started

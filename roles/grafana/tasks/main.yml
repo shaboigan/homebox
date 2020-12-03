@@ -30,7 +30,7 @@
     volumes:
       - "/opt/grafana:/config:rw"
     networks:
-      - name: IoT
+      - name: redbeard
         aliases:
           - grafana
     purge_networks: yes

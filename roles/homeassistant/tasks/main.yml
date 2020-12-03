@@ -30,7 +30,7 @@
     volumes:
       - "/opt/homeassistant:/config:rw"
     networks:
-      - name: IoT
+      - name: redbeard
         aliases:
           - homeassistant
     purge_networks: yes

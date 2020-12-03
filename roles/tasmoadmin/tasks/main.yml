@@ -29,7 +29,7 @@
     volumes:
       - "/opt/tasmoadmin/data:/data:rw"
     networks:
-      - name: IoT
+      - name: redbeard
         aliases:
           - tasmoadmin
     purge_networks: yes

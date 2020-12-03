@@ -29,7 +29,7 @@
     volumes:
       - "/opt/nodered:/data:rw"
     networks:
-      - name: IoT
+      - name: redbeard
         aliases:
           - nodered
     purge_networks: yes

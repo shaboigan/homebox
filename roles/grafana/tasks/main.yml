@@ -2,21 +2,6 @@
 #                   GNU General Public License v3.0                     #
 #########################################################################
 ---
-#- name: "Set DNS Record on CloudFlare"
-#  include_role:
-#    name: cloudflare-dns
-#  vars:
-#    subdomain: grafana
-#
-#- name: Slurp hashed htpasswd
-#  slurp:
-#    src: "/opt/traefik/.htpasswd"
-#  register: hashed
-#
-#- name: Set hashed password
-#  set_fact:
-#    htpasswd: "{{ hashed['content'] | b64decode }}"
-
 - name: Stop and remove any existing container
   docker_container:
     name: grafana
@@ -40,18 +25,11 @@
       GROUP_ID: "{{ gid }}"
       GF_INSTALL_PLUGINS: "grafana-clock-panel,grafana-simple-json-datasource"
     labels:
-#      traefik.enable: "true"
-#      traefik.backend: "grafana"
-#      traefik.frontend.redirect.entryPoint: "https"
-#      traefik.frontend.rule: "Host:grafana.{{ user.domain }}"
-#      traefik.port: "3000"
-#      traefik.frontend.auth.basic: "{{ htpasswd }}"
-#      traefik.docker.network: "redbeard"
       "com.github.homebox.homebox_managed": "true"
     volumes:
-#      - "/opt/grafana:/config:rw"
+      - "/opt/grafana:/config:rw"
     networks:
-      - name: redbeard
+      - name: IoT
         aliases:
           - grafana
     purge_networks: yes

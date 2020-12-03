@@ -12,14 +12,28 @@
   when: ('redbeard' in docker_networks.stdout_lines)
 
 - name: "Network | Create new redbeard docker network block"
-  block:
-
-  - name: Create redbeard network
-    docker_network:
-      name: redbeard
+  docker_network:
+    name: redbeard
+    driver_options:
+      com.docker.network.bridge.name: redbeard
+    ipam_options:
+      subnet: '192.168.1.0/24'
+      gateway: 192.168.1.1
       state: present
 
   when: ('redbeard' not in docker_networks.stdout_lines)
+
+- name: "Network | Create new IoT docker network block"
+  docker_network:
+    name: IoT
+    driver_options:
+      parent: eth0.10
+    ipam_options:
+      subnet: '10.10.10.0/24'
+      gateway: 10.10.10.1
+      state: present
+
+  when: ('IoT' not in docker_networks.stdout_lines)
 
 - name: "Network | Rebuild existing redbeard docker network block"
   block:

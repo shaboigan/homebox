@@ -2,21 +2,6 @@
 #                   GNU General Public License v3.0                     #
 #########################################################################
 ---
-#- name: "Set DNS Record on CloudFlare"
-#  include_role:
-#    name: cloudflare-dns
-#  vars:
-#    subdomain: mosquitto
-#
-#- name: Slurp hashed htpasswd
-#  slurp:
-#    src: "/opt/traefik/.htpasswd"
-#  register: hashed
-#
-#- name: Set hashed password
-#  set_fact:
-#    htpasswd: "{{ hashed['content'] | b64decode }}"
-
 - name: Stop and remove any existing container
   docker_container:
     name: mosquitto
@@ -42,20 +27,13 @@
       GROUP_ID: "{{ gid }}"
       TZ: "{{ tz }}"
     labels:
-#      traefik.enable: "false"
-#      traefik.backend: "mosquitto"
-#      traefik.frontend.redirect.entryPoint: "https"
-#      traefik.frontend.rule: "Host:mosquitto.{{ user.domain }}"
-#      traefik.port: "1883"
-#      traefik.frontend.auth.basic: "{{ htpasswd }}"
-#      traefik.docker.network: "redbeard"
       "com.github.homebox.homebox_managed": "true"
     volumes:
       - "/opt/mosquitto/config:/mosquitto/config:rw"
       - "/opt/mosquitto/data:/mosquitto/data:rw"
       - "/opt/mosquitto/logs:/mosquitto/logs:rw"
     networks:
-      - name: redbeard
+      - name: IoT
         aliases:
           - mosquitto
     purge_networks: yes

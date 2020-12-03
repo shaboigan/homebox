@@ -4,33 +4,41 @@
 ---
 - name: Stop and remove any existing container
   docker_container:
-    name: nodered
+    name: homepi
     state: absent
 
-- name: Create nodered directories
+- name: Create pihole directories
   file: "path={{ item }} state=directory mode=0775 owner={{ user.name }} group={{ user.name }}"
   with_items:
-    - /opt/nodered
-    - /opt/scripts/nodered
+    - /opt/IoTpi
 
 - name: Create and start container
   docker_container:
-    name: nodered
-    image: "nodered/node-red:latest"
+    name: pihole
+    image: "pihole/pihole:latest"
     pull: yes
+    capabilities:
+      - NET_ADMIN
     published_ports:
-      - "1880:1880"
+      - "53:53/tcp"
+      - "53:53/udp"
+      - "67:67/udp"
+      - "8080:80"
+      - "8443:443"
     env:
       USER_ID: "{{ uid }}"
       GROUP_ID: "{{ gid }}"
+      TZ: "{{ tz }}"
+      WEBPASSWORD: "{{ user.pass }}"
     labels:
       "com.github.homebox.homebox_managed": "true"
     volumes:
-      - "/opt/nodered:/data:rw"
+      - "/opt/pihole/etc-pihole/:/etc/pihole/"
+      - "/opt/pihole/etc-dnsmasq.d/:/etc/dnsmasq.d/"
     networks:
       - name: IoT
         aliases:
-          - nodered
+          - homepi
     purge_networks: yes
     restart_policy: always
     state: started

@@ -31,6 +31,7 @@
       GROUP_ID: "{{ gid }}"
       TZ: "{{ tz }}"
       WEBPASSWORD: "{{ user.pass }}"
+      SERVERIP: 10.10.10.254
     labels:
       "com.github.homebox.homebox_managed": "true"
     volumes:
@@ -42,4 +43,20 @@
           - iotpi
     purge_networks: yes
     restart_policy: always
+    state: started
+
+- name: Stop container to customize network
+  docker_container:
+    name: iotpi
+    state: stopped
+
+- name: "Remote from  IoT network to set static ip"
+  shell: "docker network disconnect IoT iotpi"
+
+- name: "Connect to  IoT network on static ip"
+  shell: "docker network connect IoT --ip 10.10.10.254"
+
+- name: Start container to apply network changes
+  docker_container:
+    name: iotpi
     state: started

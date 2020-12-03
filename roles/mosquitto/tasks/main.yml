@@ -40,3 +40,22 @@
     purge_networks: yes
     restart_policy: always
     state: started
+
+- name: Stop container to customize network
+  docker_container:
+    name: mosquitto
+    state: stopped
+
+- name: "Remote from IoT network to set static ip"
+  shell: "docker network disconnect IoT mosquitto"
+
+- name: "Connect to IoT network on static ip"
+  shell: "docker network connect IoT mosquitto --ip 10.10.10.2"
+
+- name: "Connect to redbeard network on static ip"
+  shell: "docker network connect redbeard mosquitto --ip 172.18.0.10"
+
+- name: Start container to apply network changes
+  docker_container:
+    name: mosquitto
+    state: started

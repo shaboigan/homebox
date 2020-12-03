@@ -18,6 +18,7 @@
     hostname: iotpi
     image: "pihole/pihole:latest"
     pull: yes
+    ip: 10.10.10.254
     capabilities:
       - NET_ADMIN
     published_ports:

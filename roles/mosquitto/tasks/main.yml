@@ -19,7 +19,6 @@
     hostname: mosquitto
     image: "eclipse-mosquitto"
     pull: yes
-    ip: 10.10.10.2
     published_ports:
       - 1883:1883
       - 8883:8883

@@ -50,7 +50,7 @@
   shell: "docker network disconnect IoT mosquitto"
 
 - name: "Connect to IoT network on static ip"
-  shell: "docker network connect IoT mosquitto --ip 10.10.10.2"
+  shell: "docker network connect IoT mosquitto --ip 10.10.10.10"
 
 - name: "Connect to redbeard network on static ip"
   shell: "docker network connect redbeard mosquitto --ip 172.18.0.10"

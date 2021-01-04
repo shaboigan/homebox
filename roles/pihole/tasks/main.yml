@@ -31,7 +31,6 @@
     env:
       USER_ID: "{{ uid }}"
       GROUP_ID: "{{ gid }}"
-      TZ: "{{ tz }}"
       WEBPASSWORD: "{{ user.pass }}"
     labels:
       "com.github.homebox.homebox_managed": "true"

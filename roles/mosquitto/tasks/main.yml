@@ -26,7 +26,6 @@
     env:
       USER_ID: "{{ uid }}"
       GROUP_ID: "{{ gid }}"
-      TZ: "{{ tz }}"
     labels:
       "com.github.homebox.homebox_managed": "true"
     volumes:

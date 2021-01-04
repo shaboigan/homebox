@@ -29,7 +29,6 @@
     env:
       USER_ID: "{{ uid }}"
       GROUP_ID: "{{ gid }}"
-      TZ: "{{ tz }}"
       WEBPASSWORD: "{{ user.pass }}"
       SERVERIP: 10.10.10.254
     labels:

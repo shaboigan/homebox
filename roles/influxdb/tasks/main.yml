@@ -28,6 +28,7 @@
       "com.github.homebox.homebox_managed": "true"
     volumes:
       - "/opt/influxdb:/var/lib/influxdb:rw"
+      - "/etc/localtime:/etc/localtime:ro"
     networks:
       - name: redbeard
         aliases:

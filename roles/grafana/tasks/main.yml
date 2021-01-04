@@ -29,6 +29,7 @@
       "com.github.homebox.homebox_managed": "true"
     volumes:
       - "/opt/grafana:/config:rw"
+      - "/etc/localtime:/etc/localtime:ro"      
     networks:
       - name: redbeard
         aliases:

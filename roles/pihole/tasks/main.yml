@@ -18,7 +18,7 @@
     name: pihole
     hostname: pihole
     image: "pihole/pihole:latest"
-    pull: yes
+    pull: no
     capabilities:
       - NET_ADMIN
     network_mode: host
@@ -38,6 +38,7 @@
     volumes:
       - "/opt/pihole/etc-pihole/:/etc/pihole/"
       - "/opt/pihole/etc-dnsmasq.d/:/etc/dnsmasq.d/"
+      - "/etc/localtime:/etc/localtime:ro"
 #    networks:
 #      - name: redbeard
 #        aliases:

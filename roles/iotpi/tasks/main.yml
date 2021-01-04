@@ -37,6 +37,7 @@
     volumes:
       - "/opt/iotpi/etc-pihole/:/etc/pihole/"
       - "/opt/iotpi/etc-dnsmasq.d/:/etc/dnsmasq.d/"
+      - "/etc/localtime:/etc/localtime:ro"
     networks:
       - name: IoT
         aliases:
@@ -54,7 +55,7 @@
   shell: "docker network disconnect IoT iotpi"
 
 - name: "Connect to  IoT network on static ip"
-  shell: "docker network connect IoT --ip 10.10.10.254"
+  shell: "docker network connect IoT iotpi --ip 10.10.10.254"
 
 - name: Start container to apply network changes
   docker_container:

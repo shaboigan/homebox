@@ -4,36 +4,37 @@
 ---
 - name: Stop and remove any existing container
   docker_container:
-    name: homeassistant
+    name: samba
     state: absent
 
-- name: Create homeassistant directories
+- name: Create samba directories
   file: "path={{ item }} state=directory mode=0775 owner={{ user.name }} group={{ user.name }}"
   with_items:
-    - /opt/homeassistant
-    - /opt/scripts/homeassistant
+    - /opt/samba
+    - /opt/scripts/samba
 
 - name: Create and start container
   docker_container:
-    name: homeassistant
-    hostname: homeassistant
-    image: "homeassistant/raspberrypi4-64-homeassistant"
+    name: samba
+    hostname: samba
+    image: "dperson/samba:latest"
     pull: yes
     published_ports:
-      - "8123:8123"
+      - "139:139"
+      - "445:445"
     env:
-      USER_ID: "{{ uid }}"
-      GROUP_ID: "{{ gid }}"
-      TZ: "{{ tz }}"
+      USER1: "{{ uid }}"
+      SHARE1: "share;/mount"
     labels:
       "com.github.homebox.homebox_managed": "true"
     volumes:
-      - "/opt/homeassistant:/config:rw"
-      - "/etc/localtime:/etc/localtime:ro"
+      - "/opt/samba:/config:rw"
+      - "/mnt/ext-hdd:/mount"
+      - "/etc/localtime:/etc/localtime:ro"      
     networks:
       - name: redbeard
         aliases:
-          - homeassistant
+          - samba
     purge_networks: yes
     restart_policy: always
     state: started

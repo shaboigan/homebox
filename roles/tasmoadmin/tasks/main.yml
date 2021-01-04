@@ -28,6 +28,7 @@
       "com.github.homebox.homebox_managed": "true"
     volumes:
       - "/opt/tasmoadmin/data:/data:rw"
+      - "/etc/localtime:/etc/localtime:ro"
     networks:
       - name: redbeard
         aliases:

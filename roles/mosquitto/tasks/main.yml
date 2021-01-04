@@ -33,6 +33,7 @@
       - "/opt/mosquitto/config:/mosquitto/config:rw"
       - "/opt/mosquitto/data:/mosquitto/data:rw"
       - "/opt/mosquitto/logs:/mosquitto/logs:rw"
+      - "/etc/localtime:/etc/localtime:ro"
     networks:
       - name: IoT
         aliases:

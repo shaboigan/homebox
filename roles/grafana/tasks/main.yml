@@ -25,11 +25,12 @@
       USER_ID: "{{ uid }}"
       GROUP_ID: "{{ gid }}"
       GF_INSTALL_PLUGINS: "grafana-clock-panel,grafana-simple-json-datasource"
+      TZ: "{{ timezone }}"
     labels:
       "com.github.homebox.homebox_managed": "true"
     volumes:
       - "/opt/grafana:/config:rw"
-      - "/etc/localtime:/etc/localtime:ro"      
+#      - "/etc/localtime:/etc/localtime:ro"      
     networks:
       - name: redbeard
         aliases:

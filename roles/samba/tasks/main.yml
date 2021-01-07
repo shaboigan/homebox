@@ -25,12 +25,13 @@
     env:
       USER1: "{{ uid }}"
       SHARE1: "share;/mount"
+      TZ: "{{ timezone }}"
     labels:
       "com.github.homebox.homebox_managed": "true"
     volumes:
       - "/opt/samba:/config:rw"
       - "/mnt/ext-hdd:/mount"
-      - "/etc/localtime:/etc/localtime:ro"      
+##      - "/etc/localtime:/etc/localtime:ro"
     networks:
       - name: redbeard
         aliases:

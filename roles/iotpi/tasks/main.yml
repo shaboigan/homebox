@@ -31,12 +31,13 @@
       GROUP_ID: "{{ gid }}"
       WEBPASSWORD: "{{ user.pass }}"
       SERVERIP: 10.10.10.254
+      TZ: "{{ timezone }}"
     labels:
       "com.github.homebox.homebox_managed": "true"
     volumes:
       - "/opt/iotpi/etc-pihole/:/etc/pihole/"
       - "/opt/iotpi/etc-dnsmasq.d/:/etc/dnsmasq.d/"
-      - "/etc/localtime:/etc/localtime:ro"
+#      - "/etc/localtime:/etc/localtime:ro"
     networks:
       - name: IoT
         aliases:

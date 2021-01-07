@@ -24,11 +24,12 @@
     env:
       USER_ID: "{{ uid }}"
       GROUP_ID: "{{ gid }}"
+      TZ: "{{ timezone }}"
     labels:
       "com.github.homebox.homebox_managed": "true"
     volumes:
       - "/opt/nodered:/data:rw"
-      - "/etc/localtime:/etc/localtime:ro"
+#      - "/etc/localtime:/etc/localtime:ro"
     networks:
       - name: redbeard
         aliases:

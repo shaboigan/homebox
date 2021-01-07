@@ -32,12 +32,13 @@
       USER_ID: "{{ uid }}"
       GROUP_ID: "{{ gid }}"
       WEBPASSWORD: "{{ user.pass }}"
+      TZ: "{{ timezone }}"
     labels:
       "com.github.homebox.homebox_managed": "true"
     volumes:
       - "/opt/pihole/etc-pihole/:/etc/pihole/"
       - "/opt/pihole/etc-dnsmasq.d/:/etc/dnsmasq.d/"
-      - "/etc/localtime:/etc/localtime:ro"
+#      - "/etc/localtime:/etc/localtime:ro"
 #    networks:
 #      - name: redbeard
 #        aliases:

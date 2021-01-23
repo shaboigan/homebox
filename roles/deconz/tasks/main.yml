@@ -17,7 +17,7 @@
   docker_container:
     name: deconz
     hostname: deconz
-    image: "marthoc/deconz:arch-arm64"
+    image: "marthoc/deconz:arm64"
     pull: yes
     published_ports:
       - "4443:4443"

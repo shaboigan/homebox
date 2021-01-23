@@ -29,6 +29,7 @@
     - { role: tasmoadmin, tags: ['core', 'homebox', 'tasmoadmin'] }
     - { role: influxdb, tags: ['core', 'homebox', 'influxdb'] }
     - { role: mosquitto, tags: ['core', 'homebox', 'mosquitto'] }
+    - { role: deconz, tags: ['core', 'homebox', 'deconz'] }
     - { role: cloudflare, tags: ['core', 'homebox', 'cloudflare'], when: ['cloudflare_enabled'] }
     - { role: feeder, tags: ['feeder_mount', 'feeder_mount_override', 'feeder_unmount'] }
     - { role: iotpi, tags: ['iotpi'] }

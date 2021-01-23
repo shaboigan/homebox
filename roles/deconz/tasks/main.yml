@@ -1,0 +1,44 @@
+#########################################################################
+#                   GNU General Public License v3.0                     #
+#########################################################################
+---
+- name: Stop and remove any existing container
+  docker_container:
+    name: deconz
+    state: absent
+
+- name: Create deconz directories
+  file: "path={{ item }} state=directory mode=0775 owner={{ user.name }} group={{ user.name }}"
+  with_items:
+    - /opt/deconz
+    - /opt/scripts/deconz
+
+- name: Create and start container
+  docker_container:
+    name: deconz
+    hostname: deconz
+    image: "marthoc/deconz:arch-arm64"
+    pull: yes
+    published_ports:
+      - "4443:4443"
+      - "5900:5900"
+      - "9090:8080"
+    env:
+      USER_ID: "{{ uid }}"
+      GROUP_ID: "{{ gid }}"
+      TZ: "{{ timezone }}"
+      DECONZ_WS_PORT: 4443
+      DECONZ_VNC_MODE: 1
+      DECONZ_UPNP: 0
+    labels:
+      "com.github.homebox.homebox_managed": "true"
+    volumes:
+      - /opt/deconz:/root/.local/share/dresden-elektronik/deCONZ
+#      - "/etc/localtime:/etc/localtime:ro"      
+    networks:
+      - name: redbeard
+        aliases:
+          - deconz
+    purge_networks: yes
+    restart_policy: always
+    state: started

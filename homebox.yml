@@ -22,6 +22,7 @@
     - { role: unionfs, tags: ['core', 'homebox', 'mounts', 'mounts_override'] }
     - { role: scripts, tags: ['core', 'homebox', 'scripts'] }
 #    - { role: traefik, tags: ['core', 'homebox', 'traefik'] }
+    - { role: unbound, tags: ['core', 'homebox', 'unbound'] }
     - { role: pihole, tags: ['core', 'homebox', 'pihole'] }
     - { role: homeassistant, tags: ['core', 'homebox', 'homeassistant'] }
     - { role: grafana, tags: ['core', 'homebox', 'grafana'] }

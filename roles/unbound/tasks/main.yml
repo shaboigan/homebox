@@ -4,52 +4,38 @@
 ---
 - name: Stop and remove any existing container
   docker_container:
-    name: pihole
+    name: unbound
     state: absent
 
-- name: Create pihole directories
+- name: Create Unbound directories
   file: "path={{ item }} state=directory mode=0775 owner={{ user.name }} group={{ user.name }}"
   with_items:
-    - /opt/pihole
-    - /opt/scripts/pihole
+    - /opt/unbound
+    - /opt/scripts/unbound
 
 - name: Create and start container
   docker_container:
-    name: pihole
-    hostname: pihole
-    image: "pihole/pihole:latest"
+    name: unbound
+    hostname: unbound
+    image: "klutchell/unbound:arm64"
     pull: no
-    capabilities:
-      - NET_ADMIN
     network_mode: host
-#    published_ports:
-#      - "53:53/tcp"
-#      - "53:53/udp"
-#      - "67:67/udp"
-#      - "8080:80"
-#      - "8443:443"
+    published_ports:
+      - "5053:5053/udp"
     env:
       USER_ID: "{{ uid }}"
       GROUP_ID: "{{ gid }}"
       WEBPASSWORD: "{{ user.pass }}"
       TZ: "{{ timezone }}"
-      ServerIP: 192.168.1.254
-      DNS1: "127.0.0.1#5053"
-      DNS2: "127.0.0.1#5053"
-      INTERFACE: "eth0"
-      DNSMASQ_LISTENING: "eth0"
-    dns:
-      - "127.0.0.1"
     labels:
       "com.github.homebox.homebox_managed": "true"
     volumes:
-      - "/opt/pihole/etc-pihole/:/etc/pihole/"
-      - "/opt/pihole/etc-dnsmasq.d/:/etc/dnsmasq.d/"
+      - "/opt/unbound:/opt/unbound"
 #      - "/etc/localtime:/etc/localtime:ro"
 #    networks:
 #      - name: redbeard
 #        aliases:
-#          - pihole
+#          - unbound
     purge_networks: yes
     restart_policy: always
     state: started

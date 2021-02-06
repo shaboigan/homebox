@@ -11,14 +11,13 @@
   file: "path={{ item }} state=directory mode=0775 owner={{ user.name }} group={{ user.name }}"
   with_items:
     - /opt/pihole
-    - /opt/scripts/pihole
 
 - name: Create and start container
   docker_container:
     name: pihole
     hostname: pihole
     image: "pihole/pihole:latest"
-    pull: no
+    pull: yes
     capabilities:
       - NET_ADMIN
     network_mode: host
@@ -33,12 +32,12 @@
       GROUP_ID: "{{ gid }}"
       WEBPASSWORD: "{{ user.pass }}"
       TZ: "{{ timezone }}"
-      ServerIP: 192.168.1.254
+      ServerIP: 10.2.2.254
       DNS1: "127.0.0.1#5053"
       DNS2: "127.0.0.1#5053"
-      INTERFACE: "eth0"
-      DNSMASQ_LISTENING: "eth0"
-    dns:
+      INTERFACE: "eth0.2"
+      DNSMASQ_LISTENING: "eth0.2"
+    dns_servers:
       - "127.0.0.1"
     labels:
       "com.github.homebox.homebox_managed": "true"
@@ -52,4 +51,20 @@
 #          - pihole
     purge_networks: yes
     restart_policy: always
+    state: started
+
+- name: Stop container to customize network
+  docker_container:
+    name: redbeard
+    state: stopped
+
+- name: "Remove from Redbeard network to set static ip"
+  shell: "docker network disconnect redbeard pihole"
+
+- name: "Connect to Redbeard network on static ip"
+  shell: "docker network connect redbeard pihole --ip 10.2.2.254"
+
+- name: Start container to apply network changes
+  docker_container:
+    name: redbeard
     state: started

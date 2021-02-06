@@ -20,28 +20,35 @@
     pull: yes
     capabilities:
       - NET_ADMIN
-    published_ports:
-      - "53:53/tcp"
-      - "53:53/udp"
-      - "67:67/udp"
-      - "8080:80"
-      - "8443:443"
+    network_mode: host
+#    published_ports:
+#      - "53:53/tcp"
+#      - "53:53/udp"
+#      - "67:67/udp"
+#      - "8080:80"
+#      - "8443:443"
     env:
       USER_ID: "{{ uid }}"
       GROUP_ID: "{{ gid }}"
       WEBPASSWORD: "{{ user.pass }}"
-      SERVERIP: 10.10.10.254
       TZ: "{{ timezone }}"
+      ServerIP: 10.2.2.254
+      DNS1: "127.0.0.1#5053"
+      DNS2: "127.0.0.1#5053"
+      INTERFACE: "eth0.10"
+      DNSMASQ_LISTENING: "eth0.10"
+    dns_servers:
+      - "127.0.0.1"
     labels:
       "com.github.homebox.homebox_managed": "true"
     volumes:
       - "/opt/iotpi/etc-pihole/:/etc/pihole/"
       - "/opt/iotpi/etc-dnsmasq.d/:/etc/dnsmasq.d/"
 #      - "/etc/localtime:/etc/localtime:ro"
-    networks:
-      - name: IoT
-        aliases:
-          - iotpi
+#    networks:
+#      - name: IoT
+#        aliases:
+#          - iotpi
     purge_networks: yes
     restart_policy: always
     state: started
@@ -51,10 +58,10 @@
     name: iotpi
     state: stopped
 
-- name: "Remote from  IoT network to set static ip"
+- name: "Remove from IoT network to set static ip"
   shell: "docker network disconnect IoT iotpi"
 
-- name: "Connect to  IoT network on static ip"
+- name: "Connect to IoT network on static ip"
   shell: "docker network connect IoT iotpi --ip 10.10.10.254"
 
 - name: Start container to apply network changes

@@ -17,10 +17,10 @@
   docker_container:
     name: unbound
     hostname: unbound
-    image: "klutchell/unbound:arm64"
-    pull: no
-    network_mode: host
+    image: "klutchell/unbound:latest"
+    pull: yes
     published_ports:
+      - "5053:5053/tcp"
       - "5053:5053/udp"
     env:
       USER_ID: "{{ uid }}"
@@ -30,7 +30,7 @@
     labels:
       "com.github.homebox.homebox_managed": "true"
     volumes:
-      - "/opt/unbound:/opt/unbound"
+      - "/opt/unbound:/opt/unbound/etc/unbound"
 #      - "/etc/localtime:/etc/localtime:ro"
 #    networks:
 #      - name: redbeard

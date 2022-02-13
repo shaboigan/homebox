@@ -1,0 +1,63 @@
+#########################################################################
+#                   GNU General Public License v3.0                     #
+#########################################################################
+---
+- name: Stop and remove any existing container
+  docker_container:
+    name: tasmoadmin
+    state: absent
+
+- name: Create tasmoadmin directories
+  file: "path={{ item }} state=directory mode=0775 owner={{ user.name }} group={{ user.name }}"
+  with_items:
+    - /opt/tasmoadmin
+    - /opt/scripts/tasmoadmin
+
+- name: Create and start container
+  docker_container:
+    name: tasmoadmin
+    hostname: tasmoadmin
+    image: "raymondmm/tasmoadmin"
+    pull: yes
+#    published_ports:
+#      - "5555:80"
+    env:
+      USER_ID: "{{ uid }}"
+      GROUP_ID: "{{ gid }}"
+      TZ: "{{ timezone }}"
+    labels:
+      "com.github.homebox.homebox_managed": "true"
+    volumes:
+      - "/opt/tasmoadmin/data:/data:rw"
+#      - "/etc/localtime:/etc/localtime:ro"
+    networks:
+      - name: local
+        aliases:
+          - tasmoadmin
+    purge_networks: yes
+    restart_policy: always
+    state: started
+
+- name: Stop container to customize network
+  docker_container:
+    name: tasmoadmin
+    state: stopped
+
+- name: "Remove from local network to set static ip"
+  shell: "docker network disconnect local tasmoadmin"
+  ignore_errors: yes
+
+- name: "Connect to local network on static ip"
+  shell: "docker network connect local tasmoadmin --ip 172.18.0.5"
+
+- name: "Remove from IoT network to set static ip"
+  shell: "docker network disconnect IoT tasmoadmin"
+  ignore_errors: yes
+
+- name: "Connect to IoT network on static ip"
+  shell: "docker network connect IoT tasmoadmin --ip 10.10.10.5"
+
+- name: Start container to apply network changes
+  docker_container:
+    name: tasmoadmin
+    state: started

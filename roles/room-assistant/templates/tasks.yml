@@ -1,0 +1,36 @@
+all:
+  hosts:
+    'RA-BEDROOM.local':
+    'RA-KITCHEN.local':
+    'RA-OFFICE.local':
+    'RA-DININGROOM.local':
+    'RA-GARAGE.local':
+  vars:
+    room_assistant_version: latest
+    room_assistant_global_config:
+      global:
+        integrations:
+          - homeAssistant
+          - bluetoothClassic
+#         - bluetoothLowEnergy
+      homeAssistant:
+        mqttUrl: mqtt://10.10.10.10:1883
+        mqttOptions:
+          username: homeassistant
+          password: homeassistant
+      bluetoothClassic:
+        addresses:
+          - '44:4A:DB:2D:77:C1'
+#      bluetoothLowEnergy:
+#        timeout: 60
+#        allowlist:
+#        - 443B83FC-0892-4A08-AD45-36A8F85CC92E
+#        - e5f7ab6f83dd
+#        maxDistance: 5.5
+#        tagOverrides:
+#          443B83FC-0892-4A08-AD45-36A8F85CC92E:
+#            name: iPhone
+#            # # measuredPower: -61
+#            # # batteryMask: 0x0000FF00
+#          e5f7ab6f83dd:
+#            name: versa 2

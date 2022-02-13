@@ -1,0 +1,16 @@
+#########################################################################
+#                   GNU General Public License v3.0                     #
+#########################################################################
+---
+- name: Get 'homebox.yml' info
+  stat:
+    path: "{{ playbook_dir }}/homebox.yml"
+  register: homebox_yml
+
+- name: Touch 'homebox.log' file
+  file:
+    path: "{{ playbook_dir }}/homebox.log"
+    state: touch
+    owner: "{{ homebox_yml.stat.uid }}"
+    group: "{{ homebox_yml.stat.gid }}"
+    mode: 0664

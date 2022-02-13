@@ -1,0 +1,16 @@
+---
+system:
+  timezone: auto
+docker:
+  repo: edge
+  version: latest
+rclone:
+  config: 
+  remote: 
+mounts:
+  unionfs: mergerfs
+  remote: rclone_vfs
+vpn:
+  enable: no
+  port: 
+  config: 

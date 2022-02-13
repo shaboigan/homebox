@@ -1,0 +1,56 @@
+#########################################################################
+#                   GNU General Public License v3.0                     #
+#########################################################################
+---
+- name: Stop and remove any existing container
+  docker_container:
+    name: influxdb
+    state: absent
+
+- name: Create influxdb directories
+  file: "path={{ item }} state=directory mode=0775 owner={{ user.name }} group={{ user.name }}"
+  with_items:
+    - /opt/influxdb
+    - /opt/scripts/influxdb
+
+- name: Create and start container
+  docker_container:
+    name: influxdb
+    hostname: influxdb
+    image: "influxdb:latest"
+    pull: yes
+    published_ports:
+      - "8086:8086"
+    env:
+      USER_ID: "{{ uid }}"
+      GROUP_ID: "{{ gid }}"
+      TZ: "{{ timezone }}"
+    labels:
+      "com.github.homebox.homebox_managed": "true"
+    volumes:
+      - "/opt/influxdb:/var/lib/influxdb:rw"
+#      - "/etc/localtime:/etc/localtime:ro"
+    networks:
+      - name: local
+        aliases:
+          - influxdb
+    purge_networks: yes
+    restart_policy: always
+    state: started
+
+- name: Stop container to customize network
+  docker_container:
+    name: influxdb
+    state: stopped
+
+- name: "Remove from local network to set static ip"
+  shell: "docker network disconnect local influxdb"
+  ignore_errors: yes
+
+- name: "Connect to local network on static ip"
+  shell: "docker network connect local influxdb --ip 172.18.0.2"
+
+- name: Start container to apply network changes
+  docker_container:
+    name: influxdb
+    state: started

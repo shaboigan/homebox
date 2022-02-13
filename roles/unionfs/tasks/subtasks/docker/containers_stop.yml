@@ -1,0 +1,18 @@
+#########################################################################
+#                   GNU General Public License v3.0                     #
+#########################################################################
+---
+- name: "Docker | Containers Stop | Gather list of running Docker containers"
+  shell: "docker ps --format '{{ '{{' }} .Names{{ '}}' }}' --filter label=com.github.homebox.homebox_managed=true | xargs echo -n"
+  register: homebox_managed_containers
+  ignore_errors: yes
+
+# This is needed to not conflict with the other role
+- name: "Docker | Containers Stop | Set 'containers_list' variable"
+  set_fact:
+    containers_list: "{{ homebox_managed_containers.stdout }}"
+
+- name: "Docker | Containers Stop | Stop all running Docker containers"
+  shell: "docker stop {{ containers_list }}"
+  ignore_errors: yes
+  when: (containers_list | trim | length > 0)

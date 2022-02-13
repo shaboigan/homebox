@@ -1,0 +1,8 @@
+---
+downloads:
+  nzbs: /mnt/local/downloads/nzbs
+  torrents: /mnt/local/downloads/torrents
+rclone:
+  version: latest
+shell: bash
+timezone: ""

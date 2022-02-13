@@ -1,0 +1,34 @@
+#########################################################################
+#                   GNU General Public License v3.0                     #
+#########################################################################
+---
+- name: Stop and remove any existing container
+  docker_container:
+    name: room-assistant
+    state: absent
+
+- name: Create room-assistant directories
+  file: "path={{ item }} state=directory mode=0775 owner={{ user.name }} group={{ user.name }}"
+  with_items:
+    - /opt/room-assistant
+    - /opt/scripts/room-assistant
+
+- name: Create and start container
+  docker_container:
+    name: room-assistant
+    hostname: room-assistant
+    image: mkerix/room-assistant
+    pull: yes
+    network_mode: host
+    env:
+      USER_ID: "{{ uid }}"
+      GROUP_ID: "{{ gid }}"
+      TZ: "{{ timezone }}"
+    labels:
+      "com.github.homebox.homebox_managed": "true"
+    volumes:
+      - /var/run/dbus:/var/run/dbus
+      - "/opt/room-assistant:/room-assistant/config"
+      - "/etc/localtime:/etc/localtime:ro"
+    restart_policy: unless-stopped
+    state: started

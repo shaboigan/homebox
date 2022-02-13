@@ -1,0 +1,34 @@
+---
+- hosts: localhost
+  vars_files:
+    - ['accounts.yml', 'defaults/accounts.yml.default']
+    - ['settings.yml', 'defaults/settings.yml.default']
+    - ['adv_settings.yml', 'defaults/adv_settings.yml.default']
+    - ['backup_config.yml', 'defaults/backup_config.yml.default']
+  roles:
+    - { role: sanity_check, tags: ['sanity_check'] }
+    - { role: settings, tags: ['always', 'settings'] }
+    - { role: pre_tasks, tags: ['pre_tasks'] }
+    - { role: backup, tags: ['backup'] }
+    - { role: restore, tags: ['restore'] }
+    - { role: user, tags: ['core', 'homebox', 'preinstall', 'user'] }
+    - { role: shell, tags: ['core', 'homebox', 'preinstall', 'shell'] }
+    - { role: rclone, tags: ['core', 'homebox', 'preinstall', 'rclone'] }
+    - { role: system, tags: ['core', 'homebox', 'system'] }
+    - { role: common, tags: ['core', 'homebox', 'common'] }
+    - { role: docker, tags: ['core', 'homebox', 'docker'] }
+    - { role: remote, tags: ['core', 'homebox', 'mounts', 'mounts_override'], when: ['use_remote'] }
+    - { role: unionfs, tags: ['core', 'homebox', 'mounts', 'mounts_override'] }
+    - { role: scripts, tags: ['core', 'homebox', 'scripts'] }
+    - { role: cloudflared, tags: ['core', 'homebox', 'cloudflared'] }
+    - { role: pihole, tags: ['core', 'homebox', 'pihole'] }
+    - { role: homeassistant, tags: ['core', 'homebox', 'homeassistant'] }
+    - { role: grafana, tags: ['core', 'homebox', 'grafana'] }
+    - { role: nodered, tags: ['core', 'homebox', 'nodered'] }
+    - { role: tasmoadmin, tags: ['core', 'homebox', 'tasmoadmin'] }
+    - { role: influxdb, tags: ['core', 'homebox', 'influxdb'] }
+    - { role: mosquitto, tags: ['core', 'homebox', 'mosquitto'] }
+    - { role: deconz, tags: ['core', 'homebox', 'deconz'] }
+    - { role: feeder, tags: ['feeder_mount', 'feeder_mount_override', 'feeder_unmount'] }
+    - { role: room-assistant, tags: ['room-assistant'] }
+    - { role: cloudflared, tags: ['cloudflared'] }

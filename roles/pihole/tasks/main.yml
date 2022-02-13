@@ -1,0 +1,44 @@
+#########################################################################
+#                   GNU General Public License v3.0                     #
+#########################################################################
+---
+- name: Stop and remove any existing container
+  docker_container:
+    name: pihole
+    state: absent
+
+- name: Create pihole directories
+  file: "path={{ item }} state=directory mode=0775 owner={{ user.name }} group={{ user.name }}"
+  with_items:
+    - /opt/pihole
+
+- name: Create and start container
+  docker_container:
+    name: pihole
+    hostname: pihole
+    image: cbcrowe/pihole-unbound:latest
+    pull: yes
+    capabilities:
+      - NET_ADMIN
+    network_mode: host
+    env:
+      USER_ID: "{{ uid }}"
+      GROUP_ID: "{{ gid }}"
+      WEBPASSWORD: "{{ user.pass }}"
+      TZ: "{{ timezone }}"
+      ServerIP: 10.1.1.254
+      REV_SERVER: false
+      REV_SERVER_TARGET: 10.1.1.1
+      REV_SERVER_DOMAIN: local
+      REV_SERVER_CIDR: 10.1.1.0/24
+      DNS1: 127.0.0.1#5335 # Hardcoded to our Unbound server
+      DNS2: 127.0.0.1#5335 # Hardcoded to our Unbound server
+      DNSSEC: "true" # Enable DNSSEC
+    labels:
+      "com.github.homebox.homebox_managed": "true"
+    volumes:
+      - "/opt/pihole/etc-pihole/:/etc/pihole:rw"
+      - "/opt/pihole/etc-dnsmasq.d/:/etc/dnsmasq.d:rw"
+    purge_networks: yes
+    restart_policy: always
+    state: started

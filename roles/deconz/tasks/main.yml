@@ -1,0 +1,69 @@
+#########################################################################
+#                   GNU General Public License v3.0                     #
+#########################################################################
+---
+- name: Stop and remove any existing container
+  docker_container:
+    name: deconz
+    state: absent
+
+- name: Create deconz directories
+  file: "path={{ item }} state=directory mode=0775 owner={{ user.name }} group={{ user.name }}"
+  with_items:
+    - /opt/deconz
+    - /opt/scripts/deconz
+
+- name: Create and start container
+  docker_container:
+    name: deconz
+    hostname: deconz
+    image: "marthoc/deconz:arm64"
+    pull: yes
+    published_ports:
+      - "4443:4443"
+      - "5900:5900"
+      - "9090:8080"
+    devices: /dev/ttyACM0
+    env:
+      USER_ID: "{{ uid }}"
+      GROUP_ID: "{{ gid }}"
+      TZ: "{{ timezone }}"
+      DECONZ_WS_PORT: 4443
+      DECONZ_WEB_PORT: 8080
+      DECONZ_VNC_PORT: 5900
+      DECONZ_VNC_MODE: 1
+      DECONZ_UPNP: 0
+      DEBUG_INFO: 1
+      DEBUG_APS: 0
+      DEBUG_ZCL: 0
+      DEBUG_ZDP: 0
+      DEBUG_OTAU: 0
+    labels:
+      "com.github.homebox.homebox_managed": "true"
+    volumes:
+      - /opt/deconz:/root/.local/share/dresden-elektronik/deCONZ
+#      - "/etc/localtime:/etc/localtime:ro"      
+    networks:
+      - name: local
+        aliases:
+          - deconz
+    purge_networks: yes
+    restart_policy: always
+    state: started
+
+- name: Stop container to customize network
+  docker_container:
+    name: deconz
+    state: stopped
+
+- name: "Remove from local network to set static ip"
+  shell: "docker network disconnect local deconz"
+  ignore_errors: yes
+
+- name: "Connect to local network on static ip"
+  shell: "docker network connect local deconz --ip 172.18.0.6"
+
+- name: Start container to apply network changes
+  docker_container:
+    name: deconz
+    state: started

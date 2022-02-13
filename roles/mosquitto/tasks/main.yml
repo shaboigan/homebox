@@ -1,0 +1,70 @@
+#########################################################################
+#                   GNU General Public License v3.0                     #
+#########################################################################
+---
+- name: Stop and remove any existing container
+  docker_container:
+    name: mosquitto
+    state: absent
+
+- name: Create mosquitto directories
+  file: "path={{ item }} state=directory mode=0775 owner={{ user.name }} group={{ user.name }}"
+  with_items:
+    - /opt/mosquitto
+    - /opt/scripts/mosquitto
+
+- name: Create and start container
+  docker_container:
+    name: mosquitto
+    hostname: mosquitto
+    image: "eclipse-mosquitto"
+    pull: yes
+    published_ports:
+      - 1883:1883
+      - 8883:8883
+      - 9001:9001
+    env:
+      USER_ID: "{{ uid }}"
+      GROUP_ID: "{{ gid }}"
+      TZ: "{{ timezone }}"
+    labels:
+      "com.github.homebox.homebox_managed": "true"
+    volumes:
+      - "/opt/mosquitto/config:/mosquitto/config:rw"
+      - "/opt/mosquitto/data:/mosquitto/data:rw"
+      - "/opt/mosquitto/logs:/mosquitto/logs:rw"
+#      - "/etc/localtime:/etc/localtime:ro"
+    networks:
+      - name: local
+        aliases:
+          - mosquitto
+      - name: IoT
+        aliases:
+          - mosquitto
+    purge_networks: yes
+    restart_policy: always
+    state: started
+
+- name: Stop container to customize network
+  docker_container:
+    name: mosquitto
+    state: stopped
+
+- name: "Remove from local network to set static ip"
+  shell: "docker network disconnect local mosquitto"
+  ignore_errors: yes
+
+- name: "Connect to local network on static ip"
+  shell: "docker network connect local mosquitto --ip 172.18.0.10"
+
+- name: "Remove from IoT network to set static ip"
+  shell: "docker network disconnect IoT mosquitto"
+  ignore_errors: yes
+
+- name: "Connect to IoT network on static ip"
+  shell: "docker network connect IoT mosquitto --ip 10.10.10.10"
+
+- name: Start container to apply network changes
+  docker_container:
+    name: mosquitto
+    state: started

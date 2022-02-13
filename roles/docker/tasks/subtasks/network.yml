@@ -1,0 +1,91 @@
+#########################################################################
+#                   GNU General Public License v3.0                     #
+#########################################################################
+---
+- name: Network | Get list of docker networks
+  shell: docker network ls --format '{{ '{{' }} .Name{{ '}}' }}'
+  register: docker_networks
+
+- name: Network | Get reddbeard docker network gateway
+  shell: docker network inspect reddbeard -f '{{ '{{' }}range .IPAM.Config{{ '}}' }}{{ '{{' }}.Gateway{{ '}}' }}{{ '{{' }}end{{ '}}' }}'
+  register: docker_gateway
+  when: ('reddbeard' in docker_networks.stdout_lines)
+
+- name: "Network | Create new reddbeard docker network block"
+  block:
+
+  - name: Create reddbeard network
+    docker_network:
+      name: reddbeard
+      state: present
+
+  when: ('reddbeard' not in docker_networks.stdout_lines)
+
+- name: "Network | Create new IoT docker network block"
+  docker_network:
+    name: IoT
+    driver_options:
+      parent: eth0.10
+    ipam_options:
+      subnet: '10.10.10.0/24'
+      gateway: 10.10.10.1
+
+  when: ('IoT' not in docker_networks.stdout_lines)
+
+- name: "Network | Rebuild existing reddbeard docker network block"
+  block:
+
+  - name: Network | Get list of containers on reddbeard network
+    shell: docker ps -a --filter network=reddbeard --format '{{ '{{' }}.Names{{ '}}' }}'
+    register: docker_containers
+
+  - name: Network | Disconnect containers from bridge network
+    shell: docker network disconnect -f bridge {{ item }}
+    with_items: "{{ docker_containers.stdout_lines }}"
+    register: r
+    failed_when: r.rc > 1
+    ignore_errors: yes
+
+  - name: Network | Rebuild reddbeard network
+    docker_network:
+      name: reddbeard
+      state: present
+      force: yes
+
+  - name: Network | Connect containers to reddbeard network
+    shell: docker network connect reddbeard {{ item }} --alias {{ item }}
+    with_items: "{{ docker_containers.stdout_lines }}"
+    register: q
+    failed_when: q.rc > 1
+    ignore_errors: yes
+
+  when: ('reddbeard' in docker_networks.stdout_lines) and (docker_gateway.stdout == '192.168.1.1')
+
+- name: "Network | Rebuild existing IoT docker network block"
+  block:
+
+  - name: Network | Get list of containers on IoT network
+    shell: docker ps -a --filter network=IoT --format '{{ '{{' }}.Names{{ '}}' }}'
+    register: docker_IoT_containers
+
+  - name: Network | Disconnect containers from bridge network
+    shell: docker network disconnect -f bridge {{ item }}
+    with_items: "{{ docker_IoT_containers.stdout_lines }}"
+    register: r
+    failed_when: r.rc > 1
+    ignore_errors: yes
+
+  - name: Network | Rebuild reddbeard network
+    docker_network:
+      name: IoT
+      state: present
+      force: yes
+
+  - name: Network | Connect containers to IoT network
+    shell: docker network connect IoT {{ item }} --alias {{ item }}
+    with_items: "{{ docker_IoT_containers.stdout_lines }}"
+    register: q
+    failed_when: q.rc > 1
+    ignore_errors: yes
+
+  when: ('IoT' in docker_networks.stdout_lines) and (docker_gateway.stdout == '10.10.10.1')

@@ -1,0 +1,10 @@
+---
+user:
+  name:
+  pass: 
+  domain:
+mqtt:
+  user:
+  password:
+slack:
+  token:

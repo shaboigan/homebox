@@ -1,0 +1,57 @@
+#########################################################################
+#                   GNU General Public License v3.0                     #
+#########################################################################
+---
+- name: Stop and remove any existing container
+  docker_container:
+    name: grafana
+    state: absent
+
+- name: Create grafana directories
+  file: "path={{ item }} state=directory mode=0775 owner={{ user.name }} group={{ user.name }}"
+  with_items:
+    - /opt/grafana
+    - /opt/scripts/grafana
+
+- name: Create and start container
+  docker_container:
+    name: grafana
+    hostname: grafana
+    image: "grafana/grafana"
+    pull: yes
+    published_ports:
+      - "3000:3000"
+    env:
+      USER_ID: "{{ uid }}"
+      GROUP_ID: "{{ gid }}"
+      GF_INSTALL_PLUGINS: "grafana-clock-panel,grafana-simple-json-datasource"
+      TZ: "{{ timezone }}"
+    labels:
+      "com.github.homebox.homebox_managed": "true"
+    volumes:
+      - "/opt/grafana:/config:rw"
+#      - "/etc/localtime:/etc/localtime:ro"      
+    networks:
+      - name: local
+        aliases:
+          - grafana
+    purge_networks: yes
+    restart_policy: always
+    state: started
+
+- name: Stop container to customize network
+  docker_container:
+    name: grafana
+    state: stopped
+
+- name: "Remove from local network to set static ip"
+  shell: "docker network disconnect local grafana"
+  ignore_errors: yes
+
+- name: "Connect to local network on static ip"
+  shell: "docker network connect local grafana --ip 172.18.0.3"
+
+- name: Start container to apply network changes
+  docker_container:
+    name: grafana
+    state: started

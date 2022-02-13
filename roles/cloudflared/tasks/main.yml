@@ -1,0 +1,58 @@
+#########################################################################
+#                   GNU General Public License v3.0                     #
+#########################################################################
+---
+- name: Stop and remove any existing container
+  docker_container:
+    name: cloudflared
+    state: absent
+
+- name: Create cloudflared directories
+  file: "path={{ item }} state=directory mode=0775 owner={{ user.name }} group={{ user.name }}"
+  with_items:
+    - /opt/cloudflared
+
+- name: Create and start container
+  docker_container:
+    name: cloudflared
+    hostname: cloudflared
+    image: "jakejarvis/cloudflare-argo:latest"
+    pull: yes
+#    network_mode: host
+    env:
+      USER_ID: "{{ uid }}"
+      GROUP_ID: "{{ gid }}"
+      TZ: "{{ timezone }}"
+      TUNNEL_HOSTNAME: "home.{{ user.domain }}"
+      TUNNEL_URL: "http://localhost:8123"
+      TUNNEL_HOSTNAME: "homebox.{{ user.domain }}"
+      TUNNEL_URL: "ssh://localhost:22"
+    labels:
+      "com.github.homebox.homebox_managed": "true"
+    volumes:
+      - "/opt/cloudflared:/etc/cloudflared:rw"
+      - "/etc/localtime:/etc/localtime:ro"
+    networks:
+      - name: local
+        aliases:
+          - cloudflared
+    purge_networks: yes
+    restart_policy: always
+    state: started
+
+- name: Stop container to customize network
+  docker_container:
+    name: cloudflared
+    state: stopped
+
+- name: "Remove from local network to set static ip"
+  shell: "docker network disconnect local cloudflared"
+  ignore_errors: yes
+
+- name: "Connect to local network on static ip"
+  shell: "docker network connect local cloudflared --ip 172.18.0.9"
+
+- name: Start container to apply network changes
+  docker_container:
+    name: cloudflared
+    state: started

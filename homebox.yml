@@ -31,4 +31,4 @@
     - { role: deconz, tags: ['core', 'homebox', 'deconz'] }
     - { role: feeder, tags: ['feeder_mount', 'feeder_mount_override', 'feeder_unmount'] }
     - { role: room-assistant, tags: ['room-assistant'] }
-    - { role: cloudflared, tags: ['cloudflared'] }
+    - { role: esphome, tags: ['esphome'] }

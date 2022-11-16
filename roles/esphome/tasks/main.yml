@@ -1,0 +1,40 @@
+#########################################################################
+#                   GNU General Public License v3.0                     #
+#########################################################################
+---
+- name: Stop and remove any existing container
+  docker_container:
+    name: esphome
+    state: absent
+
+- name: Create esphome directories
+  file: "path={{ item }} state=directory mode=0775 owner={{ user.name }} group={{ user.name }}"
+  with_items:
+    - /opt/esphome
+    - /opt/scripts/esphome
+
+- name: Create and start container
+  docker_container:
+    name: esphome
+    hostname: esphome
+    image: "esphome/esphome:stable"
+    pull: yes
+    capabilities:
+      - NET_ADMIN
+    network_mode: host
+    env:
+      USER_ID: "{{ uid }}"
+      GROUP_ID: "{{ gid }}"
+      TZ: "{{ timezone }}"
+    labels:
+      "com.github.homebox.homebox_managed": "true"
+    volumes:
+      - "/opt/esphome:/config:rw"
+#      - "/etc/localtime:/etc/localtime:ro"      
+    networks:
+      - name: local
+        aliases:
+          - esphome
+    purge_networks: yes
+    restart_policy: always
+    state: started
